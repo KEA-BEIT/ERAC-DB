@@ -122,10 +122,21 @@ CREATE TABLE IF NOT EXISTS `modelcompatiblewithpart` (
 -- Dumping structure for procedure erac-db.NewClient
 DROP PROCEDURE IF EXISTS `NewClient`;
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `NewClient`(IN Getname Varchar(50), IN Getadresse Varchar(50), IN Getcity Varchar(50), IN Getstate Varchar(50), IN GetZIP_code MEDIUMINT, IN Getcountry Varchar(50), IN Getphone INT, IN Getemail Varchar(50))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewClient`(IN GetClientName Varchar(50), IN GetClientAddress Varchar(50), IN GetClientCity Varchar(50), IN GetClientState Varchar(50), IN GetClientZip_code MEDIUMINT, IN GetClientCountry Varchar(50), IN GetClientPhone INT, IN GetClientEmail Varchar(50))
 BEGIN
-	INSERT INTO client (ClientName, ClientAdresse, ClientCity, ClientState, ClientZIP_code, ClientCountry, ClientPhone, ClientEmail)
-	VALUES (GetClientName, GetClientAdresse, GetClientCity, GetClientState, GetClientZIP_code, GetClientCountry, GetClientPhone, GetClientEmail);
+	INSERT INTO client (ClientName, ClientAddress, ClientCity, ClientState, ClientZIP_code, ClientCountry, ClientPhone, ClientEmail)
+	VALUES (GetClientName, GetClientAddress, GetClientCity, GetClientState, GetClientZIP_code, GetClientCountry, GetClientPhone, GetClientEmail);
+END//
+DELIMITER ;
+
+
+-- Dumping structure for procedure erac-db.NewModel
+DROP PROCEDURE IF EXISTS `NewModel`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewModel`(IN GetModelName Varchar(50), IN GetModelMake Varchar(50), IN GetModelFuel Varchar(50))
+BEGIN
+	INSERT INTO model (ModelName, ModelMake, ModelMake, ModelFuel)
+	VALUES (ModelName, ModelMake, ModelMake, ModelFuel);
 END//
 DELIMITER ;
 
