@@ -20,9 +20,14 @@ USE `erac-db`;
 DROP TABLE IF EXISTS `client`;
 CREATE TABLE IF NOT EXISTS `client` (
   `ClientID` int(11) NOT NULL AUTO_INCREMENT,
-  `ClientName` varchar(50) NOT NULL,
-  `ClientAddress` varchar(50) NOT NULL,
-  `ClientContact` varchar(50) NOT NULL,
+  `ClientName` varchar(50) DEFAULT NULL,
+  `ClientAddress` varchar(50) DEFAULT NULL,
+  `ClientCity` varchar(50) DEFAULT NULL,
+  `ClientState` varchar(50) DEFAULT NULL,
+  `ClientZip_code` mediumint(9) DEFAULT NULL,
+  `ClientCountry` varchar(50) DEFAULT NULL,
+  `ClientPhone` int(11) DEFAULT NULL,
+  `ClientEmail` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`ClientID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -97,6 +102,17 @@ CREATE TABLE IF NOT EXISTS `modelcompatiblewithpart` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
+
+
+-- Dumping structure for procedure erac-db.NewClient
+DROP PROCEDURE IF EXISTS `NewClient`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewClient`(IN Getname Varchar(50), IN Getadresse Varchar(50), IN Getcity Varchar(50), IN Getstate Varchar(50), IN GetZIP_code INT, IN Getcountry Varchar(50), IN Getphone_num INT, IN Getemail Varchar(50))
+BEGIN
+	INSERT INTO client (name, adresse, city, state, ZIP_code, country, phone_num, email)
+	VALUES (Getname, Getadresse, Getcity, Getstate, GetZIP_code, Getcountry, Getphone_num, Getemail);
+END//
+DELIMITER ;
 
 
 -- Dumping structure for table erac-db.oldcar
