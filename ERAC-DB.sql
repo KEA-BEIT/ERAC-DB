@@ -64,9 +64,10 @@ CREATE TABLE IF NOT EXISTS `component` (
 
 
 -- Dumping structure for table erac-db.componenthaspart
+DROP TABLE IF EXISTS `componenthaspart`;
 CREATE TABLE IF NOT EXISTS `componenthaspart` (
-  `ComponentID` mediumint(9) DEFAULT NULL,
-  `PartID` mediumint(9) DEFAULT NULL,
+  `ComponentID` mediumint(9),
+  `PartID` mediumint(9),
   `RequiredQuantity` int(2) NOT NULL,
   KEY `FK_ComponenthasPart_component` (`ComponentID`),
   KEY `FK_ComponenthasPart_part` (`PartID`),
@@ -146,6 +147,7 @@ CREATE TABLE IF NOT EXISTS `oldcar` (
 
 
 -- Dumping structure for table erac-db.oldcargivescomponent
+DROP TABLE IF EXISTS `oldcargivescomponent`;
 CREATE TABLE IF NOT EXISTS `oldcargivescomponent` (
   `OldcarID` mediumint(9) DEFAULT NULL,
   `ComponentID` mediumint(9) DEFAULT NULL,
@@ -160,6 +162,7 @@ CREATE TABLE IF NOT EXISTS `oldcargivescomponent` (
 
 
 -- Dumping structure for table erac-db.oldcargivespart
+DROP TABLE IF EXISTS `oldcargivespart`;
 CREATE TABLE IF NOT EXISTS `oldcargivespart` (
   `OldcarID` mediumint(9) DEFAULT NULL,
   `PartID` mediumint(9) DEFAULT NULL,
@@ -178,6 +181,21 @@ DROP TABLE IF EXISTS `order`;
 CREATE TABLE IF NOT EXISTS `order` (
   `OrderID` mediumint(9) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`OrderID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.orderrequiresservice
+DROP TABLE IF EXISTS `orderrequiresservice`;
+CREATE TABLE IF NOT EXISTS `orderrequiresservice` (
+  `OrderID` mediumint(9) NOT NULL,
+  `ServiceID` mediumint(9) NOT NULL,
+  `OrSQuantity` int(11) NOT NULL,
+  KEY `FK_OrderrequiresService_order` (`OrderID`),
+  KEY `FK_OrderrequiresService_service` (`ServiceID`),
+  CONSTRAINT `FK_OrderrequiresService_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`),
+  CONSTRAINT `FK_OrderrequiresService_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
