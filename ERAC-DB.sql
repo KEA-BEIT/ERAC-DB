@@ -63,6 +63,20 @@ CREATE TABLE IF NOT EXISTS `component` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table erac-db.componenthaspart
+CREATE TABLE IF NOT EXISTS `componenthaspart` (
+  `ComponentID` mediumint(9) DEFAULT NULL,
+  `PartID` mediumint(9) DEFAULT NULL,
+  `RequiredQuantity` int(2) NOT NULL,
+  KEY `FK_ComponenthasPart_component` (`ComponentID`),
+  KEY `FK_ComponenthasPart_part` (`PartID`),
+  CONSTRAINT `FK_ComponenthasPart_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`),
+  CONSTRAINT `FK_ComponenthasPart_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table erac-db.model
 DROP TABLE IF EXISTS `model`;
 CREATE TABLE IF NOT EXISTS `model` (
@@ -126,6 +140,34 @@ CREATE TABLE IF NOT EXISTS `oldcar` (
   PRIMARY KEY (`oldcarid`),
   KEY `FK_oldcar_part` (`PartID`),
   CONSTRAINT `FK_oldcar_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.oldcargivescomponent
+CREATE TABLE IF NOT EXISTS `oldcargivescomponent` (
+  `OldcarID` mediumint(9) DEFAULT NULL,
+  `ComponentID` mediumint(9) DEFAULT NULL,
+  `OCgCQuantity` int(1) DEFAULT NULL,
+  KEY `FK_OldcargivesComponent_oldcar` (`OldcarID`),
+  KEY `FK_OldcargivesComponent_component` (`ComponentID`),
+  CONSTRAINT `FK_OldcargivesComponent_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`oldcarid`),
+  CONSTRAINT `FK_OldcargivesComponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.oldcargivespart
+CREATE TABLE IF NOT EXISTS `oldcargivespart` (
+  `OldcarID` mediumint(9) DEFAULT NULL,
+  `PartID` mediumint(9) DEFAULT NULL,
+  `OCgPQuantity` int(4) DEFAULT NULL,
+  KEY `FK_OldcargivesPart_oldcar` (`OldcarID`),
+  KEY `FK_OldcargivesPart_part` (`PartID`),
+  CONSTRAINT `FK_OldcargivesPart_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`oldcarid`),
+  CONSTRAINT `FK_OldcargivesPart_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
