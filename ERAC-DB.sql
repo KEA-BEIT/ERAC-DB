@@ -11,13 +11,37 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Dumping database structure for erac-db
-DROP DATABASE IF EXISTS `erac-db`;
 CREATE DATABASE IF NOT EXISTS `erac-db` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `erac-db`;
 
 
+-- Dumping structure for table erac-db.client
+CREATE TABLE IF NOT EXISTS `client` (
+  `ClientID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClientName` varchar(50) NOT NULL,
+  `ClientAddress` varchar(50) NOT NULL,
+  `ClientContact` varchar(50) NOT NULL,
+  PRIMARY KEY (`ClientID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.clienthasorder
+CREATE TABLE IF NOT EXISTS `clienthasorder` (
+  `ClientID` int(11) NOT NULL,
+  `OrderID` mediumint(9) NOT NULL,
+  `Timestamp` timestamp NULL DEFAULT NULL,
+  KEY `FK_ClienthasOrder_client` (`ClientID`),
+  KEY `FK_ClienthasOrder_order` (`OrderID`),
+  CONSTRAINT `FK_ClienthasOrder_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`),
+  CONSTRAINT `FK_ClienthasOrder_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table erac-db.component
-DROP TABLE IF EXISTS `component`;
 CREATE TABLE IF NOT EXISTS `component` (
   `ComponentID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `ComponenetName` char(30) NOT NULL,
@@ -31,7 +55,6 @@ CREATE TABLE IF NOT EXISTS `component` (
 
 
 -- Dumping structure for table erac-db.model
-DROP TABLE IF EXISTS `model`;
 CREATE TABLE IF NOT EXISTS `model` (
   `ModelID` int(9) NOT NULL AUTO_INCREMENT,
   `Modelname` varchar(30) NOT NULL,
@@ -43,21 +66,48 @@ CREATE TABLE IF NOT EXISTS `model` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table erac-db.modelcompatiblewithcomponent
+CREATE TABLE IF NOT EXISTS `modelcompatiblewithcomponent` (
+  `ComponentID` mediumint(9) NOT NULL,
+  `ModelID` int(11) NOT NULL,
+  KEY `FK_ModelcompatiblewithComponent_component` (`ComponentID`),
+  KEY `FK_ModelcompatiblewithComponent_model` (`ModelID`),
+  CONSTRAINT `FK_ModelcompatiblewithComponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`),
+  CONSTRAINT `FK_ModelcompatiblewithComponent_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.modelcompatiblewithpart
+CREATE TABLE IF NOT EXISTS `modelcompatiblewithpart` (
+  `ModelID` int(11) NOT NULL,
+  `PartID` mediumint(9) NOT NULL,
+  KEY `FK__model` (`ModelID`),
+  KEY `FK__part` (`PartID`),
+  CONSTRAINT `FK__model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
+  CONSTRAINT `FK__part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table erac-db.oldcar
-DROP TABLE IF EXISTS `oldcar`;
 CREATE TABLE IF NOT EXISTS `oldcar` (
   `oldcarid` mediumint(9) NOT NULL AUTO_INCREMENT,
   `LOname` varchar(30) NOT NULL,
+  `PartID` mediumint(9) NOT NULL,
   `LOaddress` varchar(60) NOT NULL,
   `LOcontact` varchar(60) NOT NULL,
-  PRIMARY KEY (`oldcarid`)
+  PRIMARY KEY (`oldcarid`),
+  KEY `FK_oldcar_part` (`PartID`),
+  CONSTRAINT `FK_oldcar_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
 
 
 -- Dumping structure for table erac-db.order
-DROP TABLE IF EXISTS `order`;
 CREATE TABLE IF NOT EXISTS `order` (
   `OrderID` mediumint(9) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`OrderID`)
@@ -67,7 +117,6 @@ CREATE TABLE IF NOT EXISTS `order` (
 
 
 -- Dumping structure for table erac-db.part
-DROP TABLE IF EXISTS `part`;
 CREATE TABLE IF NOT EXISTS `part` (
   `PartID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `Partname` char(30) NOT NULL,
@@ -81,7 +130,6 @@ CREATE TABLE IF NOT EXISTS `part` (
 
 
 -- Dumping structure for table erac-db.service
-DROP TABLE IF EXISTS `service`;
 CREATE TABLE IF NOT EXISTS `service` (
   `ServiceID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `ServiceName` varchar(60) NOT NULL,
@@ -94,8 +142,36 @@ CREATE TABLE IF NOT EXISTS `service` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table erac-db.servicecanbeperformedonmodel
+CREATE TABLE IF NOT EXISTS `servicecanbeperformedonmodel` (
+  `ServiceID` mediumint(9) NOT NULL,
+  `ModelID` int(11) NOT NULL,
+  KEY `FK_ServicecanbeperformedonModel_service` (`ServiceID`),
+  KEY `FK_ServicecanbeperformedonModel_model` (`ModelID`),
+  CONSTRAINT `FK_ServicecanbeperformedonModel_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`),
+  CONSTRAINT `FK_ServicecanbeperformedonModel_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.servicepartorder
+CREATE TABLE IF NOT EXISTS `servicepartorder` (
+  `ServiceID` mediumint(9) NOT NULL,
+  `PartID` mediumint(9) NOT NULL,
+  `OrderID` mediumint(9) NOT NULL,
+  KEY `FK_ServicePartOrder_service` (`ServiceID`),
+  KEY `FK_ServicePartOrder_part` (`PartID`),
+  KEY `FK_ServicePartOrder_order` (`OrderID`),
+  CONSTRAINT `FK_ServicePartOrder_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`),
+  CONSTRAINT `FK_ServicePartOrder_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`),
+  CONSTRAINT `FK_ServicePartOrder_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table erac-db.test
-DROP TABLE IF EXISTS `test`;
 CREATE TABLE IF NOT EXISTS `test` (
   `Column 1` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
