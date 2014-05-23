@@ -30,6 +30,19 @@ CREATE TABLE IF NOT EXISTS `component` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table erac-db.model
+DROP TABLE IF EXISTS `model`;
+CREATE TABLE IF NOT EXISTS `model` (
+  `ModelID` int(9) NOT NULL AUTO_INCREMENT,
+  `Modelname` varchar(30) NOT NULL,
+  `Make` varchar(60) NOT NULL,
+  `Fuel` varchar(60) NOT NULL,
+  PRIMARY KEY (`ModelID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table erac-db.oldcar
 DROP TABLE IF EXISTS `oldcar`;
 CREATE TABLE IF NOT EXISTS `oldcar` (
@@ -38,6 +51,16 @@ CREATE TABLE IF NOT EXISTS `oldcar` (
   `LOaddress` varchar(60) NOT NULL,
   `LOcontact` varchar(60) NOT NULL,
   PRIMARY KEY (`oldcarid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.order
+DROP TABLE IF EXISTS `order`;
+CREATE TABLE IF NOT EXISTS `order` (
+  `OrderID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`OrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -52,6 +75,20 @@ CREATE TABLE IF NOT EXISTS `part` (
   `PartQuantity` int(11) DEFAULT NULL,
   `PartPrice` int(11) DEFAULT NULL,
   PRIMARY KEY (`PartID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.service
+DROP TABLE IF EXISTS `service`;
+CREATE TABLE IF NOT EXISTS `service` (
+  `ServiceID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `ServiceName` varchar(60) NOT NULL,
+  `ServicePrice` int(60) NOT NULL,
+  `Estimatedtime` int(60) NOT NULL,
+  `All` int(1) DEFAULT NULL,
+  PRIMARY KEY (`ServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
