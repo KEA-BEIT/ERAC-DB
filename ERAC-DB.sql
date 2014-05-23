@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               5.6.14 - MySQL Community Server (GPL)
+-- Server version:               5.6.16 - MySQL Community Server (GPL)
 -- Server OS:                    Win32
 -- HeidiSQL Version:             8.3.0.4694
 -- --------------------------------------------------------
@@ -14,6 +14,47 @@
 DROP DATABASE IF EXISTS `erac-db`;
 CREATE DATABASE IF NOT EXISTS `erac-db` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `erac-db`;
+
+
+-- Dumping structure for table erac-db.component
+DROP TABLE IF EXISTS `component`;
+CREATE TABLE IF NOT EXISTS `component` (
+  `ComponentID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `ComponenetName` char(30) NOT NULL,
+  `ComponentCondition` varchar(1) NOT NULL,
+  `ComponentQuantity` int(11) DEFAULT NULL,
+  `ComponentPrice` int(10) NOT NULL,
+  PRIMARY KEY (`ComponentID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.oldcar
+DROP TABLE IF EXISTS `oldcar`;
+CREATE TABLE IF NOT EXISTS `oldcar` (
+  `oldcarid` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `LOname` varchar(30) NOT NULL,
+  `LOaddress` varchar(60) NOT NULL,
+  `LOcontact` varchar(60) NOT NULL,
+  PRIMARY KEY (`oldcarid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.part
+DROP TABLE IF EXISTS `part`;
+CREATE TABLE IF NOT EXISTS `part` (
+  `PartID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `Partname` char(30) NOT NULL,
+  `PartCondition` varchar(1) NOT NULL,
+  `PartQuantity` int(11) DEFAULT NULL,
+  `PartPrice` int(11) DEFAULT NULL,
+  PRIMARY KEY (`PartID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
 
 
 -- Dumping structure for table erac-db.test
