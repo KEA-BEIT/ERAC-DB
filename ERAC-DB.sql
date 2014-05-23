@@ -135,12 +135,9 @@ DROP TABLE IF EXISTS `oldcar`;
 CREATE TABLE IF NOT EXISTS `oldcar` (
   `oldcarid` mediumint(9) NOT NULL AUTO_INCREMENT,
   `LOname` varchar(30) NOT NULL,
-  `PartID` mediumint(9) NOT NULL,
   `LOaddress` varchar(60) NOT NULL,
   `LOcontact` varchar(60) NOT NULL,
-  PRIMARY KEY (`oldcarid`),
-  KEY `FK_oldcar_part` (`PartID`),
-  CONSTRAINT `FK_oldcar_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
+  PRIMARY KEY (`oldcarid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
