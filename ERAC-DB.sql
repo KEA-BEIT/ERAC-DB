@@ -11,20 +11,18 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Dumping database structure for erac-db
-DROP DATABASE IF EXISTS `erac-db`;
 CREATE DATABASE IF NOT EXISTS `erac-db` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `erac-db`;
 
 
 -- Dumping structure for table erac-db.client
-DROP TABLE IF EXISTS `client`;
 CREATE TABLE IF NOT EXISTS `client` (
   `ClientID` int(11) NOT NULL AUTO_INCREMENT,
   `ClientName` varchar(50) DEFAULT NULL,
   `ClientAddress` varchar(50) DEFAULT NULL,
   `ClientCity` varchar(50) DEFAULT NULL,
   `ClientState` varchar(50) DEFAULT NULL,
-  `ClientZip_code` mediumint(9) DEFAULT NULL,
+  `ClientZIP_code` mediumint(9) DEFAULT NULL,
   `ClientCountry` varchar(50) DEFAULT NULL,
   `ClientPhone` int(11) DEFAULT NULL,
   `ClientEmail` varchar(50) DEFAULT NULL,
@@ -35,7 +33,6 @@ CREATE TABLE IF NOT EXISTS `client` (
 
 
 -- Dumping structure for table erac-db.clienthasorder
-DROP TABLE IF EXISTS `clienthasorder`;
 CREATE TABLE IF NOT EXISTS `clienthasorder` (
   `ClientID` int(11) NOT NULL,
   `OrderID` mediumint(9) NOT NULL,
@@ -50,7 +47,6 @@ CREATE TABLE IF NOT EXISTS `clienthasorder` (
 
 
 -- Dumping structure for table erac-db.component
-DROP TABLE IF EXISTS `component`;
 CREATE TABLE IF NOT EXISTS `component` (
   `ComponentID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `ComponenetName` char(30) NOT NULL,
@@ -64,9 +60,10 @@ CREATE TABLE IF NOT EXISTS `component` (
 
 
 -- Dumping structure for table erac-db.componenthaspart
+DROP TABLE IF EXISTS `componenthaspart`;
 CREATE TABLE IF NOT EXISTS `componenthaspart` (
-  `ComponentID` mediumint(9) DEFAULT NULL,
-  `PartID` mediumint(9) DEFAULT NULL,
+  `ComponentID` mediumint(9),
+  `PartID` mediumint(9),
   `RequiredQuantity` int(2) NOT NULL,
   KEY `FK_ComponenthasPart_component` (`ComponentID`),
   KEY `FK_ComponenthasPart_part` (`PartID`),
@@ -78,7 +75,6 @@ CREATE TABLE IF NOT EXISTS `componenthaspart` (
 
 
 -- Dumping structure for table erac-db.model
-DROP TABLE IF EXISTS `model`;
 CREATE TABLE IF NOT EXISTS `model` (
   `ModelID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `Modelname` varchar(30) NOT NULL,
@@ -91,7 +87,6 @@ CREATE TABLE IF NOT EXISTS `model` (
 
 
 -- Dumping structure for table erac-db.modelcompatiblewithcomponent
-DROP TABLE IF EXISTS `modelcompatiblewithcomponent`;
 CREATE TABLE IF NOT EXISTS `modelcompatiblewithcomponent` (
   `ComponentID` mediumint(9) NOT NULL,
   `ModelID` mediumint(9) NOT NULL,
@@ -105,7 +100,6 @@ CREATE TABLE IF NOT EXISTS `modelcompatiblewithcomponent` (
 
 
 -- Dumping structure for table erac-db.modelcompatiblewithpart
-DROP TABLE IF EXISTS `modelcompatiblewithpart`;
 CREATE TABLE IF NOT EXISTS `modelcompatiblewithpart` (
   `ModelID` mediumint(9) NOT NULL,
   `PartID` mediumint(9) NOT NULL,
@@ -119,18 +113,16 @@ CREATE TABLE IF NOT EXISTS `modelcompatiblewithpart` (
 
 
 -- Dumping structure for procedure erac-db.NewClient
-DROP PROCEDURE IF EXISTS `NewClient`;
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `NewClient`(IN Getname Varchar(50), IN Getadresse Varchar(50), IN Getcity Varchar(50), IN Getstate Varchar(50), IN GetZIP_code INT, IN Getcountry Varchar(50), IN Getphone_num INT, IN Getemail Varchar(50))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewClient`(IN Getname Varchar(50), IN Getadresse Varchar(50), IN Getcity Varchar(50), IN Getstate Varchar(50), IN GetZIP_code MEDIUMINT, IN Getcountry Varchar(50), IN Getphone INT, IN Getemail Varchar(50))
 BEGIN
-	INSERT INTO client (name, adresse, city, state, ZIP_code, country, phone_num, email)
-	VALUES (Getname, Getadresse, Getcity, Getstate, GetZIP_code, Getcountry, Getphone_num, Getemail);
+	INSERT INTO client (ClientName, ClientAdresse, ClientCity, ClientState, ClientZIP_code, ClientCountry, ClientPhone, ClientEmail)
+	VALUES (GetClientName, GetClientAdresse, GetClientCity, GetClientState, GetClientZIP_code, GetClientCountry, GetClientPhone, GetClientEmail);
 END//
 DELIMITER ;
 
 
 -- Dumping structure for table erac-db.oldcar
-DROP TABLE IF EXISTS `oldcar`;
 CREATE TABLE IF NOT EXISTS `oldcar` (
   `oldcarid` mediumint(9) NOT NULL AUTO_INCREMENT,
   `LOname` varchar(30) NOT NULL,
@@ -146,6 +138,7 @@ CREATE TABLE IF NOT EXISTS `oldcar` (
 
 
 -- Dumping structure for table erac-db.oldcargivescomponent
+DROP TABLE IF EXISTS `oldcargivescomponent`;
 CREATE TABLE IF NOT EXISTS `oldcargivescomponent` (
   `OldcarID` mediumint(9) DEFAULT NULL,
   `ComponentID` mediumint(9) DEFAULT NULL,
@@ -160,6 +153,7 @@ CREATE TABLE IF NOT EXISTS `oldcargivescomponent` (
 
 
 -- Dumping structure for table erac-db.oldcargivespart
+DROP TABLE IF EXISTS `oldcargivespart`;
 CREATE TABLE IF NOT EXISTS `oldcargivespart` (
   `OldcarID` mediumint(9) DEFAULT NULL,
   `PartID` mediumint(9) DEFAULT NULL,
@@ -174,7 +168,6 @@ CREATE TABLE IF NOT EXISTS `oldcargivespart` (
 
 
 -- Dumping structure for table erac-db.order
-DROP TABLE IF EXISTS `order`;
 CREATE TABLE IF NOT EXISTS `order` (
   `OrderID` mediumint(9) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`OrderID`)
@@ -183,8 +176,22 @@ CREATE TABLE IF NOT EXISTS `order` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table erac-db.orderrequiresservice
+DROP TABLE IF EXISTS `orderrequiresservice`;
+CREATE TABLE IF NOT EXISTS `orderrequiresservice` (
+  `OrderID` mediumint(9) NOT NULL,
+  `ServiceID` mediumint(9) NOT NULL,
+  `OrSQuantity` int(11) NOT NULL,
+  KEY `FK_OrderrequiresService_order` (`OrderID`),
+  KEY `FK_OrderrequiresService_service` (`ServiceID`),
+  CONSTRAINT `FK_OrderrequiresService_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`),
+  CONSTRAINT `FK_OrderrequiresService_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table erac-db.part
-DROP TABLE IF EXISTS `part`;
 CREATE TABLE IF NOT EXISTS `part` (
   `PartID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `Partname` char(30) NOT NULL,
@@ -198,7 +205,6 @@ CREATE TABLE IF NOT EXISTS `part` (
 
 
 -- Dumping structure for table erac-db.service
-DROP TABLE IF EXISTS `service`;
 CREATE TABLE IF NOT EXISTS `service` (
   `ServiceID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `ServiceName` varchar(60) NOT NULL,
@@ -212,7 +218,6 @@ CREATE TABLE IF NOT EXISTS `service` (
 
 
 -- Dumping structure for table erac-db.servicecanbeperformedonmodel
-DROP TABLE IF EXISTS `servicecanbeperformedonmodel`;
 CREATE TABLE IF NOT EXISTS `servicecanbeperformedonmodel` (
   `ServiceID` mediumint(9) NOT NULL,
   `ModelID` mediumint(9) NOT NULL,
@@ -226,7 +231,6 @@ CREATE TABLE IF NOT EXISTS `servicecanbeperformedonmodel` (
 
 
 -- Dumping structure for table erac-db.servicepartorder
-DROP TABLE IF EXISTS `servicepartorder`;
 CREATE TABLE IF NOT EXISTS `servicepartorder` (
   `ServiceID` mediumint(9) NOT NULL,
   `PartID` mediumint(9) NOT NULL,
