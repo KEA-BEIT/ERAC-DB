@@ -19,7 +19,7 @@ USE `erac-db`;
 -- Dumping structure for table erac-db.client
 DROP TABLE IF EXISTS `client`;
 CREATE TABLE IF NOT EXISTS `client` (
-  `ClientID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClientID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `ClientName` varchar(50) DEFAULT NULL,
   `ClientAddress` varchar(50) DEFAULT NULL,
   `ClientCity` varchar(50) DEFAULT NULL,
@@ -37,13 +37,13 @@ CREATE TABLE IF NOT EXISTS `client` (
 -- Dumping structure for table erac-db.clienthasorder
 DROP TABLE IF EXISTS `clienthasorder`;
 CREATE TABLE IF NOT EXISTS `clienthasorder` (
-  `ClientID` int(11) NOT NULL,
+  `ClientID` mediumint(9) NOT NULL,
   `OrderID` mediumint(9) NOT NULL,
   `Timestamp` timestamp NULL DEFAULT NULL,
   KEY `FK_ClienthasOrder_client` (`ClientID`),
   KEY `FK_ClienthasOrder_order` (`OrderID`),
-  CONSTRAINT `FK_ClienthasOrder_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`),
-  CONSTRAINT `FK_ClienthasOrder_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`)
+  CONSTRAINT `FK_ClienthasOrder_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`),
+  CONSTRAINT `FK_clienthasorder_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `component` (
   `ComponenetName` char(30) NOT NULL,
   `ComponentCondition` varchar(1) NOT NULL,
   `ComponentQuantity` int(11) DEFAULT NULL,
-  `ComponentPrice` int(10) NOT NULL,
+  `ComponentPrice` int(11) NOT NULL,
   PRIMARY KEY (`ComponentID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -82,9 +82,9 @@ CREATE TABLE IF NOT EXISTS `componenthaspart` (
 DROP TABLE IF EXISTS `model`;
 CREATE TABLE IF NOT EXISTS `model` (
   `ModelID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `Modelname` varchar(30) NOT NULL,
-  `Make` varchar(60) NOT NULL,
-  `Fuel` varchar(60) NOT NULL,
+  `Modelname` varchar(50) NOT NULL,
+  `Make` varchar(50) NOT NULL,
+  `Fuel` varchar(50) NOT NULL,
   PRIMARY KEY (`ModelID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `modelcompatiblewithcomponent` (
   KEY `FK_ModelcompatiblewithComponent_component` (`ComponentID`),
   KEY `FK_ModelcompatiblewithComponent_model` (`ModelID`),
   CONSTRAINT `FK_modelcompatiblewithcomponent_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
-  CONSTRAINT `FK_ModelcompatiblewithComponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`)
+  CONSTRAINT `FK_modelcompatiblewithcomponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -133,10 +133,21 @@ DELIMITER ;
 -- Dumping structure for procedure erac-db.NewModel
 DROP PROCEDURE IF EXISTS `NewModel`;
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `NewModel`(IN GetModelName Varchar(50), IN GetModelMake Varchar(50), IN GetModelFuel Varchar(50))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewModel`(IN `GetModelName` Varchar(50), IN `GetModelMake` Varchar(50), IN `GetModelFuel` Varchar(50))
 BEGIN
-	INSERT INTO model (ModelName, ModelMake, ModelMake, ModelFuel)
-	VALUES (ModelName, ModelMake, ModelMake, ModelFuel);
+	INSERT INTO model (ModelName, ModelMake, ModelFuel)
+	VALUES (ModelName, ModelMake, ModelFuel);
+END//
+DELIMITER ;
+
+
+-- Dumping structure for procedure erac-db.NewOldcar
+DROP PROCEDURE IF EXISTS `NewOldcar`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewOldcar`(IN GetLO_Name Varchar(50), IN GetLO_Address Varchar(50), IN GetLO_Phone INT, IN GetLO_Email Varchar(50))
+BEGIN
+	INSERT INTO oldcar (LO_Name, LO_Address, LO_Phone, LO_Email)
+	VALUES (LO_Name, LO_Address, LO_Phone, LO_Email);
 END//
 DELIMITER ;
 
@@ -145,9 +156,10 @@ DELIMITER ;
 DROP TABLE IF EXISTS `oldcar`;
 CREATE TABLE IF NOT EXISTS `oldcar` (
   `oldcarid` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `LOname` varchar(30) NOT NULL,
-  `LOaddress` varchar(60) NOT NULL,
-  `LOcontact` varchar(60) NOT NULL,
+  `LO_Name` varchar(50) NOT NULL,
+  `LO_Address` varchar(50) NOT NULL,
+  `LO_Phone` varchar(50) NOT NULL,
+  `LO_Email` varchar(50) NOT NULL,
   PRIMARY KEY (`oldcarid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -159,7 +171,7 @@ DROP TABLE IF EXISTS `oldcargivescomponent`;
 CREATE TABLE IF NOT EXISTS `oldcargivescomponent` (
   `OldcarID` mediumint(9) DEFAULT NULL,
   `ComponentID` mediumint(9) DEFAULT NULL,
-  `OCgCQuantity` int(1) DEFAULT NULL,
+  `OCgCQuantity` int(2) DEFAULT NULL,
   KEY `FK_OldcargivesComponent_oldcar` (`OldcarID`),
   KEY `FK_OldcargivesComponent_component` (`ComponentID`),
   CONSTRAINT `FK_OldcargivesComponent_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`oldcarid`),
@@ -198,7 +210,7 @@ CREATE TABLE IF NOT EXISTS `order` (
 DROP TABLE IF EXISTS `part`;
 CREATE TABLE IF NOT EXISTS `part` (
   `PartID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `Partname` char(30) NOT NULL,
+  `Partname` char(50) NOT NULL,
   `PartCondition` varchar(1) NOT NULL,
   `PartQuantity` int(11) DEFAULT NULL,
   `PartPrice` int(11) DEFAULT NULL,
@@ -212,10 +224,10 @@ CREATE TABLE IF NOT EXISTS `part` (
 DROP TABLE IF EXISTS `service`;
 CREATE TABLE IF NOT EXISTS `service` (
   `ServiceID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `ServiceName` varchar(60) NOT NULL,
-  `ServicePrice` int(60) NOT NULL,
-  `Estimatedtime` int(60) NOT NULL,
-  `All` int(1) DEFAULT NULL,
+  `ServiceName` varchar(50) NOT NULL,
+  `ServicePrice` int(11) NOT NULL,
+  `Estimatedtime` int(11) NOT NULL,
+  `All` char(1) DEFAULT NULL,
   PRIMARY KEY (`ServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -230,7 +242,7 @@ CREATE TABLE IF NOT EXISTS `servicecanbeperformedonmodel` (
   KEY `FK_ServicecanbeperformedonModel_service` (`ServiceID`),
   KEY `FK_ServicecanbeperformedonModel_model` (`ModelID`),
   CONSTRAINT `FK_servicecanbeperformedonmodel_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
-  CONSTRAINT `FK_ServicecanbeperformedonModel_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`)
+  CONSTRAINT `FK_servicecanbeperformedonmodel_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
