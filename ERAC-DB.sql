@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `component` (
 -- Dumping structure for table erac-db.model
 DROP TABLE IF EXISTS `model`;
 CREATE TABLE IF NOT EXISTS `model` (
-  `ModelID` int(9) NOT NULL AUTO_INCREMENT,
+  `ModelID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `Modelname` varchar(30) NOT NULL,
   `Make` varchar(60) NOT NULL,
   `Fuel` varchar(60) NOT NULL,
@@ -75,11 +75,11 @@ CREATE TABLE IF NOT EXISTS `model` (
 DROP TABLE IF EXISTS `modelcompatiblewithcomponent`;
 CREATE TABLE IF NOT EXISTS `modelcompatiblewithcomponent` (
   `ComponentID` mediumint(9) NOT NULL,
-  `ModelID` int(11) NOT NULL,
+  `ModelID` mediumint(9) NOT NULL,
   KEY `FK_ModelcompatiblewithComponent_component` (`ComponentID`),
   KEY `FK_ModelcompatiblewithComponent_model` (`ModelID`),
-  CONSTRAINT `FK_ModelcompatiblewithComponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`),
-  CONSTRAINT `FK_ModelcompatiblewithComponent_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
+  CONSTRAINT `FK_modelcompatiblewithcomponent_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
+  CONSTRAINT `FK_ModelcompatiblewithComponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -88,12 +88,12 @@ CREATE TABLE IF NOT EXISTS `modelcompatiblewithcomponent` (
 -- Dumping structure for table erac-db.modelcompatiblewithpart
 DROP TABLE IF EXISTS `modelcompatiblewithpart`;
 CREATE TABLE IF NOT EXISTS `modelcompatiblewithpart` (
-  `ModelID` int(11) NOT NULL,
+  `ModelID` mediumint(9) NOT NULL,
   `PartID` mediumint(9) NOT NULL,
   KEY `FK__model` (`ModelID`),
   KEY `FK__part` (`PartID`),
-  CONSTRAINT `FK__model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
-  CONSTRAINT `FK__part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
+  CONSTRAINT `FK_modelcompatiblewithpart_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`),
+  CONSTRAINT `FK_modelcompatiblewithpart_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -157,11 +157,11 @@ CREATE TABLE IF NOT EXISTS `service` (
 DROP TABLE IF EXISTS `servicecanbeperformedonmodel`;
 CREATE TABLE IF NOT EXISTS `servicecanbeperformedonmodel` (
   `ServiceID` mediumint(9) NOT NULL,
-  `ModelID` int(11) NOT NULL,
+  `ModelID` mediumint(9) NOT NULL,
   KEY `FK_ServicecanbeperformedonModel_service` (`ServiceID`),
   KEY `FK_ServicecanbeperformedonModel_model` (`ModelID`),
-  CONSTRAINT `FK_ServicecanbeperformedonModel_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`),
-  CONSTRAINT `FK_ServicecanbeperformedonModel_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
+  CONSTRAINT `FK_servicecanbeperformedonmodel_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
+  CONSTRAINT `FK_ServicecanbeperformedonModel_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
