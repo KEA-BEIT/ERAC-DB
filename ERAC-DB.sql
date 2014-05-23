@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS `clienthasorder` (
 DROP TABLE IF EXISTS `component`;
 CREATE TABLE IF NOT EXISTS `component` (
   `ComponentID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `ComponenetName` char(30) NOT NULL,
-  `ComponentCondition` varchar(1) NOT NULL,
+  `ComponenetName` varchar(50) NOT NULL,
+  `ComponentCondition` char(1) NOT NULL,
   `ComponentQuantity` int(11) DEFAULT NULL,
   `ComponentPrice` int(11) NOT NULL,
   PRIMARY KEY (`ComponentID`)
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `oldcar` (
   `oldcarid` mediumint(9) NOT NULL AUTO_INCREMENT,
   `LO_Name` varchar(50) NOT NULL,
   `LO_Address` varchar(50) NOT NULL,
-  `LO_Phone` varchar(50) NOT NULL,
+  `LO_Phone` int(11) NOT NULL,
   `LO_Email` varchar(50) NOT NULL,
   PRIMARY KEY (`oldcarid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -210,10 +210,10 @@ CREATE TABLE IF NOT EXISTS `order` (
 DROP TABLE IF EXISTS `part`;
 CREATE TABLE IF NOT EXISTS `part` (
   `PartID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `Partname` char(50) NOT NULL,
-  `PartCondition` varchar(1) NOT NULL,
+  `PartName` varchar(50) NOT NULL,
+  `PartCondition` char(1) NOT NULL,
   `PartQuantity` int(11) DEFAULT NULL,
-  `PartPrice` int(11) DEFAULT NULL,
+  `PartPrice` int(11) NOT NULL,
   PRIMARY KEY (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
