@@ -78,6 +78,17 @@ CREATE TABLE IF NOT EXISTS `componenthaspart` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table erac-db.condition
+DROP TABLE IF EXISTS `condition`;
+CREATE TABLE IF NOT EXISTS `condition` (
+  `ConditionID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `ConditionName` char(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ConditionID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table erac-db.model
 DROP TABLE IF EXISTS `model`;
 CREATE TABLE IF NOT EXISTS `model` (
@@ -189,24 +200,13 @@ DROP TABLE IF EXISTS `part_amount`;
 CREATE TABLE IF NOT EXISTS `part_amount` (
   `Part_AmountID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `PartID` mediumint(9) NOT NULL DEFAULT '0',
-  `Part_ConditionID` mediumint(9) NOT NULL DEFAULT '0',
+  `ConditionID` mediumint(9) NOT NULL DEFAULT '0',
   `Part_AmountQuantity` int(11) DEFAULT NULL,
   PRIMARY KEY (`Part_AmountID`),
   KEY `PartID` (`PartID`),
-  KEY `Part_ConditionID` (`Part_ConditionID`),
-  CONSTRAINT `FK_part_amount_part_condition` FOREIGN KEY (`Part_ConditionID`) REFERENCES `part_condition` (`Part_ConditionID`),
-  CONSTRAINT `FK_part_amount_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- Data exporting was unselected.
-
-
--- Dumping structure for table erac-db.part_condition
-DROP TABLE IF EXISTS `part_condition`;
-CREATE TABLE IF NOT EXISTS `part_condition` (
-  `Part_ConditionID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `Part_ConditionName` char(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`Part_ConditionID`)
+  KEY `Part_ConditionID` (`ConditionID`),
+  CONSTRAINT `FK_part_amount_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`),
+  CONSTRAINT `FK_part_amount_condition` FOREIGN KEY (`ConditionID`) REFERENCES `condition` (`ConditionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -217,12 +217,12 @@ DROP TABLE IF EXISTS `part_value`;
 CREATE TABLE IF NOT EXISTS `part_value` (
   `Part_ValueD` mediumint(9) NOT NULL AUTO_INCREMENT,
   `PartID` mediumint(9) NOT NULL DEFAULT '0',
-  `Part_ConditionID` mediumint(9) NOT NULL DEFAULT '0',
+  `ConditionID` mediumint(9) NOT NULL DEFAULT '0',
   `Part_ValuePrice` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Part_ValueD`),
   KEY `PartID` (`PartID`),
-  KEY `Part_ConditionID` (`Part_ConditionID`),
-  CONSTRAINT `FK_part_price_part_condition` FOREIGN KEY (`Part_ConditionID`) REFERENCES `part_condition` (`Part_ConditionID`),
+  KEY `Part_ConditionID` (`ConditionID`),
+  CONSTRAINT `FK_part_value_condition` FOREIGN KEY (`ConditionID`) REFERENCES `condition` (`ConditionID`),
   CONSTRAINT `FK_part_price_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
