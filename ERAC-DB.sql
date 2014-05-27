@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS `oldcargivescomponent` (
   `OCgCQuantity` int(2) DEFAULT NULL,
   KEY `FK_OldcargivesComponent_oldcar` (`OldcarID`),
   KEY `FK_OldcargivesComponent_component` (`ComponentID`),
-  CONSTRAINT `FK_oldcargivescomponent_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`oldcarid`),
+  CONSTRAINT `FK_oldcargivescomponent_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`OldcarID`),
   CONSTRAINT `FK_oldcargivescomponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `oldcargivespart` (
   `OCgPQuantity` int(4) DEFAULT NULL,
   KEY `FK_OldcargivesPart_oldcar` (`OldcarID`),
   KEY `FK_OldcargivesPart_part` (`PartID`),
-  CONSTRAINT `FK_OldcargivesPart_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`oldcarid`),
+  CONSTRAINT `FK_OldcargivesPart_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`OldcarID`),
   CONSTRAINT `FK_OldcargivesPart_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
