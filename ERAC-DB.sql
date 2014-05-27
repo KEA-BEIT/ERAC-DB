@@ -78,13 +78,24 @@ CREATE TABLE IF NOT EXISTS `componenthaspart` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table erac-db.condition
+DROP TABLE IF EXISTS `condition`;
+CREATE TABLE IF NOT EXISTS `condition` (
+  `ConditionID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `ConditionName` char(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ConditionID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table erac-db.model
 DROP TABLE IF EXISTS `model`;
 CREATE TABLE IF NOT EXISTS `model` (
   `ModelID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `Modelname` varchar(50) NOT NULL,
-  `Make` varchar(50) NOT NULL,
-  `Fuel` varchar(50) NOT NULL,
+  `ModelName` varchar(50) NOT NULL,
+  `ModelMake` varchar(50) NOT NULL,
+  `ModelFuel` varchar(50) NOT NULL,
   PRIMARY KEY (`ModelID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -119,47 +130,14 @@ CREATE TABLE IF NOT EXISTS `modelcompatiblewithpart` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for procedure erac-db.NewClient
-DROP PROCEDURE IF EXISTS `NewClient`;
-DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `NewClient`(IN GetClientName Varchar(50), IN GetClientAddress Varchar(50), IN GetClientCity Varchar(50), IN GetClientState Varchar(50), IN GetClientZip_code MEDIUMINT, IN GetClientCountry Varchar(50), IN GetClientPhone INT, IN GetClientEmail Varchar(50))
-BEGIN
-	INSERT INTO client (ClientName, ClientAddress, ClientCity, ClientState, ClientZIP_code, ClientCountry, ClientPhone, ClientEmail)
-	VALUES (GetClientName, GetClientAddress, GetClientCity, GetClientState, GetClientZIP_code, GetClientCountry, GetClientPhone, GetClientEmail);
-END//
-DELIMITER ;
-
-
--- Dumping structure for procedure erac-db.NewModel
-DROP PROCEDURE IF EXISTS `NewModel`;
-DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `NewModel`(IN `GetModelName` Varchar(50), IN `GetModelMake` Varchar(50), IN `GetModelFuel` Varchar(50))
-BEGIN
-	INSERT INTO model (ModelName, ModelMake, ModelFuel)
-	VALUES (ModelName, ModelMake, ModelFuel);
-END//
-DELIMITER ;
-
-
--- Dumping structure for procedure erac-db.NewOldcar
-DROP PROCEDURE IF EXISTS `NewOldcar`;
-DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `NewOldcar`(IN GetLO_Name Varchar(50), IN GetLO_Address Varchar(50), IN GetLO_Phone INT, IN GetLO_Email Varchar(50))
-BEGIN
-	INSERT INTO oldcar (LO_Name, LO_Address, LO_Phone, LO_Email)
-	VALUES (LO_Name, LO_Address, LO_Phone, LO_Email);
-END//
-DELIMITER ;
-
-
 -- Dumping structure for table erac-db.oldcar
 DROP TABLE IF EXISTS `oldcar`;
 CREATE TABLE IF NOT EXISTS `oldcar` (
   `OldcarID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `LO_Name` varchar(50) NOT NULL,
-  `LO_Address` varchar(50) NOT NULL,
-  `LO_Phone` int(11) NOT NULL,
-  `LO_Email` varchar(50) NOT NULL,
+  `OldcarLO_Name` varchar(50) NOT NULL,
+  `OldcarLO_Address` varchar(50) NOT NULL,
+  `OldcarLO_Phone` int(11) NOT NULL,
+  `OldcarLO_Email` varchar(50) NOT NULL,
   PRIMARY KEY (`OldcarID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -222,24 +200,13 @@ DROP TABLE IF EXISTS `part_amount`;
 CREATE TABLE IF NOT EXISTS `part_amount` (
   `Part_AmountID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `PartID` mediumint(9) NOT NULL DEFAULT '0',
-  `Part_ConditionID` mediumint(9) NOT NULL DEFAULT '0',
+  `ConditionID` mediumint(9) NOT NULL DEFAULT '0',
   `Part_AmountQuantity` int(11) DEFAULT NULL,
   PRIMARY KEY (`Part_AmountID`),
   KEY `PartID` (`PartID`),
-  KEY `Part_ConditionID` (`Part_ConditionID`),
-  CONSTRAINT `FK_part_amount_part_condition` FOREIGN KEY (`Part_ConditionID`) REFERENCES `part_condition` (`Part_ConditionID`),
-  CONSTRAINT `FK_part_amount_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- Data exporting was unselected.
-
-
--- Dumping structure for table erac-db.part_condition
-DROP TABLE IF EXISTS `part_condition`;
-CREATE TABLE IF NOT EXISTS `part_condition` (
-  `Part_ConditionID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `Part_ConditionName` char(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`Part_ConditionID`)
+  KEY `Part_ConditionID` (`ConditionID`),
+  CONSTRAINT `FK_part_amount_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`),
+  CONSTRAINT `FK_part_amount_condition` FOREIGN KEY (`ConditionID`) REFERENCES `condition` (`ConditionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -250,12 +217,12 @@ DROP TABLE IF EXISTS `part_value`;
 CREATE TABLE IF NOT EXISTS `part_value` (
   `Part_ValueD` mediumint(9) NOT NULL AUTO_INCREMENT,
   `PartID` mediumint(9) NOT NULL DEFAULT '0',
-  `Part_ConditionID` mediumint(9) NOT NULL DEFAULT '0',
+  `ConditionID` mediumint(9) NOT NULL DEFAULT '0',
   `Part_ValuePrice` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Part_ValueD`),
   KEY `PartID` (`PartID`),
-  KEY `Part_ConditionID` (`Part_ConditionID`),
-  CONSTRAINT `FK_part_price_part_condition` FOREIGN KEY (`Part_ConditionID`) REFERENCES `part_condition` (`Part_ConditionID`),
+  KEY `Part_ConditionID` (`ConditionID`),
+  CONSTRAINT `FK_part_value_condition` FOREIGN KEY (`ConditionID`) REFERENCES `condition` (`ConditionID`),
   CONSTRAINT `FK_part_price_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -305,16 +272,6 @@ CREATE TABLE IF NOT EXISTS `servicepartorder` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
-
-
--- Dumping structure for procedure erac-db.UpdatePartPrice
-DROP PROCEDURE IF EXISTS `UpdatePartPrice`;
-DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdatePartPrice`(IN GetPartID MEDIUMINT, IN GetPart_ConditionID MEDIUMINT, SetPart_Price INT)
-BEGIN
-	UPDATE part_value SET Part_Price = SetPart_Price WHERE PartID = GetPartID AND Part_ConditionID = GetPart_ConditionID;
-END//
-DELIMITER ;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
