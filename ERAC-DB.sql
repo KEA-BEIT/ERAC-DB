@@ -42,8 +42,8 @@ CREATE TABLE IF NOT EXISTS `clienthasorder` (
   `Timestamp` timestamp NULL DEFAULT NULL,
   KEY `FK_ClienthasOrder_client` (`ClientID`),
   KEY `FK_ClienthasOrder_order` (`OrderID`),
-  CONSTRAINT `FK_ClienthasOrder_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`),
-  CONSTRAINT `FK_clienthasorder_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`)
+  CONSTRAINT `FK_clienthasorder_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`),
+  CONSTRAINT `FK_ClienthasOrder_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS `clienthasorder` (
 DROP TABLE IF EXISTS `component`;
 CREATE TABLE IF NOT EXISTS `component` (
   `ComponentID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `ComponenetName` char(30) NOT NULL,
-  `ComponentCondition` varchar(1) NOT NULL,
+  `ComponenetName` varchar(50) NOT NULL,
+  `ComponentCondition` char(1) NOT NULL,
   `ComponentQuantity` int(11) DEFAULT NULL,
   `ComponentPrice` int(11) NOT NULL,
   PRIMARY KEY (`ComponentID`)
@@ -98,8 +98,8 @@ CREATE TABLE IF NOT EXISTS `modelcompatiblewithcomponent` (
   `ModelID` mediumint(9) NOT NULL,
   KEY `FK_ModelcompatiblewithComponent_component` (`ComponentID`),
   KEY `FK_ModelcompatiblewithComponent_model` (`ModelID`),
-  CONSTRAINT `FK_modelcompatiblewithcomponent_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
-  CONSTRAINT `FK_modelcompatiblewithcomponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`)
+  CONSTRAINT `FK_modelcompatiblewithcomponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`),
+  CONSTRAINT `FK_modelcompatiblewithcomponent_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -112,8 +112,8 @@ CREATE TABLE IF NOT EXISTS `modelcompatiblewithpart` (
   `PartID` mediumint(9) NOT NULL,
   KEY `FK__model` (`ModelID`),
   KEY `FK__part` (`PartID`),
-  CONSTRAINT `FK_modelcompatiblewithpart_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`),
-  CONSTRAINT `FK_modelcompatiblewithpart_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
+  CONSTRAINT `FK_modelcompatiblewithpart_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
+  CONSTRAINT `FK_modelcompatiblewithpart_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -155,12 +155,12 @@ DELIMITER ;
 -- Dumping structure for table erac-db.oldcar
 DROP TABLE IF EXISTS `oldcar`;
 CREATE TABLE IF NOT EXISTS `oldcar` (
-  `oldcarid` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `OldcarID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `LO_Name` varchar(50) NOT NULL,
   `LO_Address` varchar(50) NOT NULL,
-  `LO_Phone` varchar(50) NOT NULL,
+  `LO_Phone` int(11) NOT NULL,
   `LO_Email` varchar(50) NOT NULL,
-  PRIMARY KEY (`oldcarid`)
+  PRIMARY KEY (`OldcarID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -174,8 +174,8 @@ CREATE TABLE IF NOT EXISTS `oldcargivescomponent` (
   `OCgCQuantity` int(2) DEFAULT NULL,
   KEY `FK_OldcargivesComponent_oldcar` (`OldcarID`),
   KEY `FK_OldcargivesComponent_component` (`ComponentID`),
-  CONSTRAINT `FK_OldcargivesComponent_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`oldcarid`),
-  CONSTRAINT `FK_OldcargivesComponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`)
+  CONSTRAINT `FK_oldcargivescomponent_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`OldcarID`),
+  CONSTRAINT `FK_oldcargivescomponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `oldcargivespart` (
   `OCgPQuantity` int(4) DEFAULT NULL,
   KEY `FK_OldcargivesPart_oldcar` (`OldcarID`),
   KEY `FK_OldcargivesPart_part` (`PartID`),
-  CONSTRAINT `FK_OldcargivesPart_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`oldcarid`),
+  CONSTRAINT `FK_OldcargivesPart_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`OldcarID`),
   CONSTRAINT `FK_OldcargivesPart_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -210,11 +210,53 @@ CREATE TABLE IF NOT EXISTS `order` (
 DROP TABLE IF EXISTS `part`;
 CREATE TABLE IF NOT EXISTS `part` (
   `PartID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `Partname` char(50) NOT NULL,
-  `PartCondition` varchar(1) NOT NULL,
-  `PartQuantity` int(11) DEFAULT NULL,
-  `PartPrice` int(11) DEFAULT NULL,
+  `PartName` varchar(50) NOT NULL,
   PRIMARY KEY (`PartID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.part_amount
+DROP TABLE IF EXISTS `part_amount`;
+CREATE TABLE IF NOT EXISTS `part_amount` (
+  `Part_AmountID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `PartID` mediumint(9) NOT NULL DEFAULT '0',
+  `Part_ConditionID` mediumint(9) NOT NULL DEFAULT '0',
+  `Part_AmountQuantity` int(11) DEFAULT NULL,
+  PRIMARY KEY (`Part_AmountID`),
+  KEY `PartID` (`PartID`),
+  KEY `Part_ConditionID` (`Part_ConditionID`),
+  CONSTRAINT `FK_part_amount_part_condition` FOREIGN KEY (`Part_ConditionID`) REFERENCES `part_condition` (`Part_ConditionID`),
+  CONSTRAINT `FK_part_amount_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.part_condition
+DROP TABLE IF EXISTS `part_condition`;
+CREATE TABLE IF NOT EXISTS `part_condition` (
+  `Part_ConditionID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `Part_ConditionName` char(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`Part_ConditionID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.part_value
+DROP TABLE IF EXISTS `part_value`;
+CREATE TABLE IF NOT EXISTS `part_value` (
+  `Part_ValueD` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `PartID` mediumint(9) NOT NULL DEFAULT '0',
+  `Part_ConditionID` mediumint(9) NOT NULL DEFAULT '0',
+  `Part_ValuePrice` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`Part_ValueD`),
+  KEY `PartID` (`PartID`),
+  KEY `Part_ConditionID` (`Part_ConditionID`),
+  CONSTRAINT `FK_part_price_part_condition` FOREIGN KEY (`Part_ConditionID`) REFERENCES `part_condition` (`Part_ConditionID`),
+  CONSTRAINT `FK_part_price_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -257,12 +299,22 @@ CREATE TABLE IF NOT EXISTS `servicepartorder` (
   KEY `FK_ServicePartOrder_service` (`ServiceID`),
   KEY `FK_ServicePartOrder_part` (`PartID`),
   KEY `FK_ServicePartOrder_order` (`OrderID`),
-  CONSTRAINT `FK_ServicePartOrder_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`),
+  CONSTRAINT `FK_ServicePartOrder_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`),
   CONSTRAINT `FK_ServicePartOrder_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`),
-  CONSTRAINT `FK_ServicePartOrder_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`)
+  CONSTRAINT `FK_ServicePartOrder_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
+
+
+-- Dumping structure for procedure erac-db.UpdatePartPrice
+DROP PROCEDURE IF EXISTS `UpdatePartPrice`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdatePartPrice`(IN GetPartID MEDIUMINT, IN GetPart_ConditionID MEDIUMINT, SetPart_Price INT)
+BEGIN
+	UPDATE part_value SET Part_Price = SetPart_Price WHERE PartID = GetPartID AND Part_ConditionID = GetPart_ConditionID;
+END//
+DELIMITER ;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
