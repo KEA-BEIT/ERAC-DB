@@ -15,7 +15,7 @@ choice = gets.chomp.downcase
 
 case choice
 
-when 'newclient' #Need client car otherwice finished
+when 'newclient' #Need to make some methods. This code is discusting
 
 	puts "Name:"
 	Client_name = gets.chomp.downcase
@@ -44,10 +44,162 @@ when 'newclient' #Need client car otherwice finished
 		puts "Error message: #{e.errstr}"
 	end
 
-	rows = dbh.do(
+	dbh.do (
 		"INSERT INTO client (ClientName, ClientAddress, ClientCity, ClientState, ClientZip_code, ClientCountry, ClientPhone, ClientEmail)
 		VALUES ('#{Client_name}', '#{Client_address}', '#{Client_city}', '#{Client_state}', #{Client_zip_code}, '#{Client_country}', #{Client_phone}, '#{Client_email}')"
 		)
+	Clientcar_owner = dbh.func(:insert_id)
+
+	puts "Cars model:"
+	Clientcar_model = gets.chomp.downcase
+	puts "Cars make:"
+	Clientcar_make = gets.chomp.downcase
+	puts "Cars fuelsource:"
+	Clientcar_fuel = gets.chomp.downcase
+
+	dbh.do (
+	"INSERT INTO clientcar (ClientcarModel, ClientcarMake, ClientcarFuel)		
+	VALUES ('#{Clientcar_model}', '#{Clientcar_make}', '#{Clientcar_fuel}')"
+	)
+	Clientcar_car = dbh.func(:insert_id)
+
+	dbh.do (
+		"INSERT INTO clienthasclientcar (ClientID, ClientcarID)
+		VALUES (#{Clientcar_owner}, #{Clientcar_car})"
+		)	
+
+
+	dbh.disconnect
+	puts "\nDisconnected from server" 
+
+when 'newclientcar' #Add a new car to a client(done). This code is discusting
+
+	puts "To which client does this car belong? (id)"
+	Clientcar_owner = gets.chomp.to_i
+	puts "Cars model:"
+	Clientcar_model = gets.chomp.downcase
+	puts "Cars make:"
+	Clientcar_make = gets.chomp.downcase
+	puts "Cars fuelsource:"
+	Clientcar_fuel = gets.chomp.downcase
+
+	begin
+		dbh = DBI.connect("DBI:Mysql:erac-db:localhost", "root","")
+		row = dbh.select_one("SELECT VERSION()")
+		puts "Server version: "+ row[0]
+	rescue DBI::DatabaseError => e
+		puts "An error occurred"
+		puts "Error code: #{e.err}"
+		puts "Error message: #{e.errstr}"
+	end
+
+	dbh.do (
+		"INSERT INTO clientcar (ClientcarModel, ClientcarMake, ClientcarFuel)
+		VALUES ('#{Clientcar_model}', '#{Clientcar_make}', '#{Clientcar_fuel}')"
+		)
+	Clientcar_car = dbh.func(:insert_id)
+	# Need failsafe here
+	dbh.do (
+		"INSERT INTO clienthasclientcar (ClientID, ClientcarID)
+		VALUES (#{Clientcar_owner}, #{Clientcar_car})"
+		)
+
+	dbh.disconnect
+	puts "\nDisconnected from server" 
+
+when 'neworder' #Create a new order of anykind related to a specific client
+
+	dbh.disconnect
+	puts "\nDisconnected from server" 
+
+when 'newgenservice' #Create a new generel service
+
+
+	dbh.disconnect
+	puts "\nDisconnected from server" 
+
+when 'newspecservice' #Create a new model specific service
+
+
+	dbh.disconnect
+	puts "\nDisconnected from server" 
+
+when 'budget' #Pull the estimated price of an order
+
+
+	dbh.disconnect
+	puts "\nDisconnected from server" 
+
+when 'compatiable' #Pull all compatiable parts in stock
+	ArrClientcarID = Array.new
+	ArrClientcars = Array.new
+	ArrClientcar = Array.new
+	ArrModelID = Array.new
+
+	puts "Client id:"
+	Client_id = gets.chomp.to_i
+
+	begin
+		dbh = DBI.connect("DBI:Mysql:erac-db:localhost", "root","")
+		row = dbh.select_one("SELECT VERSION()")
+		puts "Server version: "+ row[0]
+	rescue DBI::DatabaseError => e
+		puts "An error occurred"
+		puts "Error code: #{e.err}"
+		puts "Error message: #{e.errstr}"
+	end	
+	
+	x_sth = dbh.execute("SELECT ClientcarID FROM clienthasclientcar WHERE ClientID = #{Client_id}")
+	x_sth.fetch_array do |row|
+		ArrClientcarID += row
+	end
+	x_sth.finish
+
+	ArrClientcarID.each do |f|
+		y_sth = dbh.execute("SELECT * FROM clientcar WHERE ClientcarID = #{f}")
+		y_sth.fetch_array do |row|
+			ArrClientcars += row
+		end
+	end
+
+
+	puts "\n\nWhich of your cars do you want to check agianst compatiable parts: (ID)"
+	count = 0
+	ArrClientcars.each do |g|
+		print "#{g} "
+		if count == 3
+			print "\n"
+			count = 0
+		else
+			count += 1
+		end
+	end
+
+	Clientcar_id = gets.chomp.to_i #Need failsafe
+
+	if ArrClientcars.index("#{Clientcar_id}") != nil
+		z_sth = dbh.execute("SELECT ClientcarModel, ClientcarMake, ClientcarFuel FROM clientcar WHERE ClientcarID = #{Clientcar_id}")
+		z_sth.fetch_array do |row|
+			ArrClientcar += row
+		end
+		z_sth.finish
+		Clientcar_model = ArrClientcar[0].to_s
+		Clientcar_make = ArrClientcar[1].to_s
+		Clientcar_fuel = ArrClientcar[2].to_s
+
+		t_sth = dbh.execute("SELECT ModelID FROM model WHERE ModelName = '#{ClientcarModel}' AND ModelMake = '#{ClientcarMake}' AND ModelFuel = '#{ClientcarFuel}'")
+		t_sth.fetch_array do |row|
+			ArrModelID = row
+		end
+		
+	
+
+
+
+
+
+
+
 
 	dbh.disconnect
 	puts "\nDisconnected from server" 
@@ -71,7 +223,7 @@ when 'newmodel' #Isn't part of the requriement but need som features to be funct
 		puts "Error message: #{e.errstr}"
 	end		
 
-	rows = dbh.do(
+	dbh.do (
 		"INSERT INTO model (ModelName, ModelMake, ModelFuel)
 		VALUES ('#{Model_name}', '#{Model_make}', '#{Model_fuel}') "
 		)
@@ -99,7 +251,7 @@ when 'newoldcar' #Finished
 		puts "Error message: #{e.errstr}"
 	end	
 
-	rows = dbh.do(
+	dbh.do (
 		"INSERT INTO oldcar (OldcarLO_Name, OldcarLO_Address, OldcarLO_Phone, OldcarLO_Email)
 		VALUES ('#{Oldcar_lo_name}', '#{Oldcar_lo_address}', #{Oldcar_lo_phone}, '#{Oldcar_lo_email}')"	
 		)
@@ -204,7 +356,7 @@ when 'newpart' #Missing: adding compatability with models
 	else #Updating part amount
 		puts "not null"
 
-		Pa_sth = dbh.execute("SELECT Part_AmountQuantity FROM part_amount WHERE PartID = #{Arrpart_id[0]} and ConditionID = #{Arrcondition_id[0]}")
+		Pa_sth = dbh.execute("SELECT Part_AmountQuantity FROM part_amount WHERE PartID = #{Arrpart_id[0]} AND ConditionID = #{Arrcondition_id[0]}")
 		Pa_sth.fetch_array do |row|
 			 Arrpart_amount_quan = row
 		end
@@ -219,7 +371,7 @@ when 'newpart' #Missing: adding compatability with models
 				)
 			puts "\nPartID: #{Arrpart_id[0]} with condition #{Arrcondition_id[0]} and amount of #{Part_Amount_quantity}"
 
-			Pv_sth = dbh.execute("SELECT Part_ValuePrice FROM part_value WHERE PartID = #{Arrpart_id[0]} and ConditionID = #{Arrcondition_id[0]}")
+			Pv_sth = dbh.execute("SELECT Part_ValuePrice FROM part_value WHERE PartID = #{Arrpart_id[0]} AND ConditionID = #{Arrcondition_id[0]}")
 			Pv_sth.fetch_array do |row|
 				Arrpart_value_price = row
 			end
@@ -249,7 +401,7 @@ when 'newpart' #Missing: adding compatability with models
 		else
 
 			U_Part_amount = Arrpart_amount_quan[0].to_i + Part_Amount_quantity
-			dbh.do ("UPDATE part_amount SET Part_AmountQuantity = #{U_Part_amount} WHERE PartID = #{Arrpart_id[0]} and ConditionID = #{Arrcondition_id[0]}")
+			dbh.do ("UPDATE part_amount SET Part_AmountQuantity = #{U_Part_amount} WHERE PartID = #{Arrpart_id[0]} AND ConditionID = #{Arrcondition_id[0]}")
 			puts "\nUpdated quantity at PartID: #{Arrpart_id[0]} and ConditionID: #{Arrcondition_id[0]} to #{U_Part_amount}"
 
 		end
