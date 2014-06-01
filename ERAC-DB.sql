@@ -152,8 +152,8 @@ CREATE TABLE IF NOT EXISTS `oldcargivescomponent` (
   `OCgCQuantity` int(2) DEFAULT NULL,
   KEY `FK_OldcargivesComponent_oldcar` (`OldcarID`),
   KEY `FK_OldcargivesComponent_component` (`ComponentID`),
-  CONSTRAINT `FK_oldcargivescomponent_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`OldcarID`),
-  CONSTRAINT `FK_oldcargivescomponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`)
+  CONSTRAINT `FK_oldcargivescomponent_component` FOREIGN KEY (`ComponentID`) REFERENCES `component` (`ComponentID`),
+  CONSTRAINT `FK_oldcargivescomponent_oldcar` FOREIGN KEY (`OldcarID`) REFERENCES `oldcar` (`OldcarID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -184,6 +184,23 @@ CREATE TABLE IF NOT EXISTS `order` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table erac-db.orderrequiresservice
+DROP TABLE IF EXISTS `orderrequiresservice`;
+CREATE TABLE IF NOT EXISTS `orderrequiresservice` (
+  `OrSID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `OrderID` mediumint(9) NOT NULL DEFAULT '0',
+  `ServiceID` mediumint(9) NOT NULL DEFAULT '0',
+  `OrSQuantity` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`OrSID`),
+  KEY `OrderID` (`OrderID`),
+  KEY `ServiceID` (`ServiceID`),
+  CONSTRAINT `FK_orderrequiresservice_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`),
+  CONSTRAINT `FK_orderrequiresservice_service` FOREIGN KEY (`ServiceID`) REFERENCES `service` (`ServiceID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table erac-db.part
 DROP TABLE IF EXISTS `part`;
 CREATE TABLE IF NOT EXISTS `part` (
@@ -205,8 +222,8 @@ CREATE TABLE IF NOT EXISTS `part_amount` (
   PRIMARY KEY (`Part_AmountID`),
   KEY `PartID` (`PartID`),
   KEY `Part_ConditionID` (`ConditionID`),
-  CONSTRAINT `FK_part_amount_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`),
-  CONSTRAINT `FK_part_amount_condition` FOREIGN KEY (`ConditionID`) REFERENCES `condition` (`ConditionID`)
+  CONSTRAINT `FK_part_amount_condition` FOREIGN KEY (`ConditionID`) REFERENCES `condition` (`ConditionID`),
+  CONSTRAINT `FK_part_amount_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -222,8 +239,8 @@ CREATE TABLE IF NOT EXISTS `part_value` (
   PRIMARY KEY (`Part_ValueD`),
   KEY `PartID` (`PartID`),
   KEY `Part_ConditionID` (`ConditionID`),
-  CONSTRAINT `FK_part_value_condition` FOREIGN KEY (`ConditionID`) REFERENCES `condition` (`ConditionID`),
-  CONSTRAINT `FK_part_price_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
+  CONSTRAINT `FK_part_price_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`),
+  CONSTRAINT `FK_part_value_condition` FOREIGN KEY (`ConditionID`) REFERENCES `condition` (`ConditionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -235,7 +252,6 @@ CREATE TABLE IF NOT EXISTS `service` (
   `ServiceID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `ServiceName` varchar(50) NOT NULL,
   `ServicePrice` int(11) NOT NULL,
-  `Estimatedtime` int(11) NOT NULL,
   `All` char(1) DEFAULT NULL,
   PRIMARY KEY (`ServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
