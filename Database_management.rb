@@ -108,12 +108,44 @@ when 'newclientcar' #Add a new car to a client(done). This code is discusting
 	puts "\nDisconnected from server" 
 
 when 'neworder' #Create a new order of anykind related to a specific client
-
+	
 	dbh.disconnect
 	puts "\nDisconnected from server" 
 
 when 'newgenservice' #Create a new generel service
+	ArrGenservice_id = Array.new
 
+	begin
+		dbh = DBI.connect("DBI:Mysql:erac-db:localhost", "root","")
+		row = dbh.select_one("SELECT VERSION()")
+		puts "Server version: "+ row[0]
+	rescue DBI::DatabaseError => e
+		puts "An error occurred"
+		puts "Error code: #{e.err}"
+		puts "Error message: #{e.errstr}"
+	end
+
+	puts "Service name:"
+	Genservice_name = gets.chomp.downcase
+	puts "Type: (if none wirte null)"
+	Genservice_type = gets.chomp.downcase
+	puts "Service price:"
+	Genservice_price = gets.chomp.to_i
+
+	Gs_sth = dbh.execute("SELECT GenServiceID FROM generelservice WHERE GenServiceName = '#{Genservice_name}' AND GenServiceType = '#{Genservice_type}'")
+	Gs_sth.fetch_array do |row|
+		ArrGenservice_id = row
+	end
+	Gs_sth.finish
+
+	if ArrGenservice_id[0] == nil
+		dbh.do (
+		"INSERT INTO generelservice (GenServiceName, GenServiceType, GenServicePrice)		
+		VALUES ('#{Genservice_name}', '#{Genservice_type}' #{Genservice_price})"
+		)
+	else
+		puts "A service of the same name and type already exsits under GenServiceID: #{ArrGenservice_id[0]}"
+	end
 
 	dbh.disconnect
 	puts "\nDisconnected from server" 
@@ -191,10 +223,6 @@ when 'compatiable' #Pull all compatiable parts in stock
 		t_sth.fetch_array do |row|
 			ArrModelID = row
 		end
-		
-	
-
-
 
 
 
