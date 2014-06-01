@@ -15,7 +15,7 @@ choice = gets.chomp.downcase
 
 case choice
 
-when 'newclient'
+when 'newclient' #Need client car otherwice finished
 
 	puts "Name:"
 	Client_name = gets.chomp.downcase
@@ -50,9 +50,9 @@ when 'newclient'
 		)
 
 	dbh.disconnect
-	puts "\nDisconnected from server"
+	puts "\nDisconnected from server" 
 
-when 'newmodel'
+when 'newmodel' #Isn't part of the requriement but need som features to be functionel
 
 	puts "Model:"
 	Model_name = gets.chomp.downcase
@@ -76,9 +76,9 @@ when 'newmodel'
 		VALUES ('#{Model_name}', '#{Model_make}', '#{Model_fuel}') "
 		)
 	dbh.disconnect
-	puts "\nDisconnected from server"
+	puts "\nDisconnected from server" 
 
-when 'newoldcar'
+when 'newoldcar' #Finished
 
 	puts "Lastowner name:"
 	Oldcar_lo_name = gets.chomp.downcase
@@ -107,11 +107,14 @@ when 'newoldcar'
 	dbh.disconnect
 	puts "\nDisconnected from server"
 
-when 'newpart'
+when 'newpart' #Missing: adding compatability with models
 	C_cond_input = false
 	C_quan_input = false
+	P_value_input = false
 	Arrpart_id = Array.new
 	Arrcondition_id = Array.new
+	Arrpart_amount_quan = Array.new
+	Arrpart_value_price = Array.new
 
 	puts "What is the parts name?"
 	Part_name = gets.chomp.downcase
@@ -139,7 +142,7 @@ when 'newpart'
 	Part_Amount_quantity = gets.chomp.to_i
 
 		if Part_Amount_quantity < 0
-			puts "\nPleae input a number which is not negative."
+			puts "\nPleae input a number which is not negative:"
 		else
 			C_quan_input = true
 		end
@@ -157,14 +160,15 @@ when 'newpart'
 
 	
 
-	sth = dbh.execute("SELECT PartID FROM part WHERE PartName = '#{Part_name}'")
-	sth.fetch_array do |row|
-		Arrpart_id = row[0]
+	Pn_sth = dbh.execute("SELECT PartID FROM part WHERE PartName = '#{Part_name}'")
+	Pn_sth.fetch_array do |row|
+		Arrpart_id = row
 	end
 
-	sth.finish
+	Pn_sth.finish
 
-	if Arrpart_id[0] == nil
+	if Arrpart_id[0] == nil #Have to add compatability with model
+		#PartID.New
 		puts "null"
 		dbh.do (
 			"INSERT INTO part (PartName)
@@ -179,10 +183,78 @@ when 'newpart'
 			)
 		puts "\n\nPartID: #{id} with condition: #{Arrcondition_id[0]} and amount of #{Part_Amount_quantity}"
 
-	else
-		puts "not null"
-	end
+		#Pricetag
+		puts "\nSince this is a new part what is it basic pricetag? (DKK)"
+		while P_value_input == false
+			Part_Value_price = gets.chomp.to_i
+			if Part_Value_price < 0
+				puts "\nPleae input a number which is not negative:"
+			else
+				P_value_input = true
+			end
+		end
+		dbh.do (
+			"INSERT INTO part_value (PartID, ConditionID, Part_ValuePrice)
+			VALUES (#{id}, #{Arrcondition_id[0]}, #{Part_Value_price})"
+			)
+		puts "\nPartID: #{id} with condition #{Arrcondition_id[0]} and the value of #{Part_Value_price}"
 
+		#Compatiable with model - will return to that 
+
+	else #Updating part amount
+		puts "not null"
+
+		Pa_sth = dbh.execute("SELECT Part_AmountQuantity FROM part_amount WHERE PartID = #{Arrpart_id[0]} and ConditionID = #{Arrcondition_id[0]}")
+		Pa_sth.fetch_array do |row|
+			 Arrpart_amount_quan = row
+		end
+
+		Pa_sth.finish
+
+		if Arrpart_amount_quan[0] == nil
+			puts "need new row"
+			dbh.do (
+				"INSERT INTO part_amount (PartID, ConditionID, Part_AmountQuantity)
+				VALUES (#{Arrpart_id[0]}, #{Arrcondition_id[0]}, #{Part_Amount_quantity})"
+				)
+			puts "\nPartID: #{Arrpart_id[0]} with condition #{Arrcondition_id[0]} and amount of #{Part_Amount_quantity}"
+
+			Pv_sth = dbh.execute("SELECT Part_ValuePrice FROM part_value WHERE PartID = #{Arrpart_id[0]} and ConditionID = #{Arrcondition_id[0]}")
+			Pv_sth.fetch_array do |row|
+				Arrpart_value_price = row
+			end
+
+			Pv_sth.finish
+
+			if Arrpart_value_price[0] == nil
+				puts "There is no pricetag for the part #{Arrpart_id[0]} with this condition #{Arrcondition_id[0]}. Please input the pricetag:"
+				while P_value_input == false
+					Part_Value_price = gets.chomp.to_i
+					if Part_Value_price < 0
+					puts "\nPleae input a number which is not negative:"
+					else
+					P_value_input = true
+					end
+				end
+				dbh.do (
+					"INSERT INTO part_value (PartID, ConditionID, Part_ValuePrice)
+					VALUES (#{Arrpart_id[0]}, #{Arrcondition_id[0]}, #{Part_Value_price})"
+					)
+				puts "\nPartID: #{Arrpart_id[0]} with condition #{Arrcondition_id[0]} and the value of #{Part_Value_price}"
+
+			else
+				puts "\nThere already is price!"
+			end
+
+		else
+
+			U_Part_amount = Arrpart_amount_quan[0].to_i + Part_Amount_quantity
+			dbh.do ("UPDATE part_amount SET Part_AmountQuantity = #{U_Part_amount} WHERE PartID = #{Arrpart_id[0]} and ConditionID = #{Arrcondition_id[0]}")
+			puts "\nUpdated quantity at PartID: #{Arrpart_id[0]} and ConditionID: #{Arrcondition_id[0]} to #{U_Part_amount}"
+
+		end
+
+	end
 
 	dbh.disconnect
 	puts "\nDisconnected from server"
