@@ -109,11 +109,12 @@ when 'newclientcar' #Add a new car to a client(done). This code is discusting
 
 when 'neworder' #Create a new order of anykind related to a specific client
 	
-	dbh.disconnect
-	puts "\nDisconnected from server" 
-
-when 'newgenservice' #Create a new generel service
-	ArrGenservice_id = Array.new
+	puts "Which client would like to place a order:"
+	Client_id = gets.chomp.to_i
+	puts "On what car should the service(s) be preformed:"
+	Clientcar_id = gets.chomp.to_i
+	puts "Generel service(gen) or replacement service(rep)?"
+	C_service = gets.chomp.downcase
 
 	begin
 		dbh = DBI.connect("DBI:Mysql:erac-db:localhost", "root","")
@@ -125,12 +126,67 @@ when 'newgenservice' #Create a new generel service
 		puts "Error message: #{e.errstr}"
 	end
 
+	if C_service == "gen"
+
+		puts "Which generel service would you like:"
+		C_gen_service = gets.chomp.to_i
+
+		dbh.do (
+			"INSERT INTO order (ClientID, ClientcarID)
+			VALUES (#{Client_id}, #{Clientcar_id})"
+			)
+
+		Order_id = dbh.(:insert_id)
+
+		dbh.do (
+			"INSERT INTO orderrequiresgenerelservice (OrderID, GenServiceID, OrGSQuantity)
+			VALUES (#{Order_id}, #{C_gen_service}, 1)"
+			)
+
+
+	elsif C_service == "rep"
+
+		puts "Which replacement service would you like:"
+		C_rep_service = gets.chomp.to_i
+
+		dbh.do (
+			"INSERT INTO order (ClientID, ClientcarID)
+			VALUES (#{Client_id}, #{Clientcar_id})"
+			)
+		
+		Order_id = dbh.(:insert_id)
+
+		dbh.do (
+			"INSERT INTO orderrequriesspecificservice (OrderID, SpecServiceID, OrGSQuantity) 
+			VALUES (#{Order_id}, #{C_rep_service}, 1)"
+			)
+
+	else
+		puts "So no service?"
+	end
+
+	dbh.disconnect
+	puts "\nDisconnected from server" 
+
+when 'newgenservice' #Create a new generel service
+	ArrGenservice_id = Array.new
+
+
 	puts "Service name:"
 	Genservice_name = gets.chomp.downcase
 	puts "Type: (if none wirte null)"
 	Genservice_type = gets.chomp.downcase
 	puts "Service price:"
 	Genservice_price = gets.chomp.to_i
+
+	begin
+		dbh = DBI.connect("DBI:Mysql:erac-db:localhost", "root","")
+		row = dbh.select_one("SELECT VERSION()")
+	rescue DBI::DatabaseError => e
+		puts "An error occurred"
+		puts "Error code: #{e.err}"
+		puts "Error message: #{e.errstr}"
+	end
 
 	Gs_sth = dbh.execute("SELECT GenServiceID FROM generelservice WHERE GenServiceName = '#{Genservice_name}' AND GenServiceType = '#{Genservice_type}'")
 	Gs_sth.fetch_array do |row|
@@ -151,12 +207,77 @@ when 'newgenservice' #Create a new generel service
 	puts "\nDisconnected from server" 
 
 when 'newspecservice' #Create a new model specific service
+	ArrSpecservice_id = Array.new
+
+	puts "Specific service name:"
+	SpecService_name = gets.chomp.downcase
+#	puts "Service price:"
+#	SpecService_price = gets.chomp.to_i
+
+	Ss_sth = dbh.execute("SELECT SpecServiceID FROM specificservice WHERE SpecServiceName = '#{SpecService_name}'")
+	Ss_sth.fetch_array do |row|
+		ArrSpecservice_id = row
+	end
+	Ss_sth.finish
+
+	if ArrSpecservice_id[0] == nil
+
+
+	else
+		puts "A service of the same name and type already exsits under SpecServiceID: #{ArrSpecservice_id[0]}"
+
+		puts "Would you like to update the price(p) of the service or add a model(m) service can be preformed on: ('n' for no)"
+		C_spec_PorM = gets.chomp.downcase
+		
+		if C_spec_PorM == "p"
+
+			puts "For which model do you want to change the price:"
+			PorM_model_id = gets.chomp.to_i
+
+
+		elsif C_spec_PorM == "m"
+
+		elsif C_spec_PorM == "n"
+		
+		end			
+				
+	end
+
 
 
 	dbh.disconnect
 	puts "\nDisconnected from server" 
 
 when 'budget' #Pull the estimated price of an order
+	Arrbudgetgen_price = Array.new
+
+	puts "Which service would you like to get a budget for? ('gen' or 'rep')"
+	C_budget_service = gets.chomp.downcase
+
+	if C_budget_service == "gen"
+		puts "Which service: (id)"
+		budget_gen_id = gets.chomp.to_i
+
+		Bsg_sth = dbh.execute("SELECT GenServicePrice FROM generelservice WHERE GenServiceID = #{budget_gen_id}")
+
+		Bsg_sth.fetch_array do |row|
+			Arrbudgetgen_price = row
+		end
+		Bsg_sth.finish
+
+		if Arrbudgetgen_price[0] == nil
+			puts "The service you tried to get the price of does not exsits!"
+		else
+			puts "\nThe budget for service #{budget_gen_id} is #{Arrbudgetgen_price[0]}"
+		end
+
+	elsif C_budget_service == "rep"
+
+
+	else
+	
+	end
+
 
 
 	dbh.disconnect
@@ -223,9 +344,6 @@ when 'compatiable' #Pull all compatiable parts in stock
 		t_sth.fetch_array do |row|
 			ArrModelID = row
 		end
-
-
-
 
 
 

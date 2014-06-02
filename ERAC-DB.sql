@@ -54,26 +54,8 @@ CREATE TABLE IF NOT EXISTS `clienthasclientcar` (
   `ClientcarID` mediumint(9) NOT NULL,
   KEY `ClientID` (`ClientID`),
   KEY `ClientcarID` (`ClientcarID`),
-  CONSTRAINT `FK_clienthasclientcar_clientcar` FOREIGN KEY (`ClientcarID`) REFERENCES `clientcar` (`ClientcarID`),
-  CONSTRAINT `FK_clienthasclientcar_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- Data exporting was unselected.
-
-
--- Dumping structure for table erac-db.clienthasorderforclientcar
-DROP TABLE IF EXISTS `clienthasorderforclientcar`;
-CREATE TABLE IF NOT EXISTS `clienthasorderforclientcar` (
-  `ClientID` mediumint(9) NOT NULL,
-  `OrderID` mediumint(9) NOT NULL,
-  `ClientcarID` mediumint(9) NOT NULL,
-  `Timestamp` timestamp NULL DEFAULT NULL,
-  KEY `ClientID` (`ClientID`),
-  KEY `OrderID` (`OrderID`),
-  KEY `ClientcarID` (`ClientcarID`),
-  CONSTRAINT `FK_clienthasorderforclientcar_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`),
-  CONSTRAINT `FK_clienthasorderforclientcar_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`),
-  CONSTRAINT `FK_clienthasorderforclientcar_clientcar` FOREIGN KEY (`ClientcarID`) REFERENCES `clientcar` (`ClientcarID`)
+  CONSTRAINT `FK_clienthasclientcar_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`),
+  CONSTRAINT `FK_clienthasclientcar_clientcar` FOREIGN KEY (`ClientcarID`) REFERENCES `clientcar` (`ClientcarID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -149,9 +131,13 @@ CREATE TABLE IF NOT EXISTS `oldcargivespart` (
 DROP TABLE IF EXISTS `order`;
 CREATE TABLE IF NOT EXISTS `order` (
   `OrderID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `OrderStartdate` timestamp NULL DEFAULT NULL,
-  `OrderEnddate` datetime DEFAULT NULL,
-  PRIMARY KEY (`OrderID`)
+  `ClientID` mediumint(9) NOT NULL,
+  `ClientcarID` mediumint(9) NOT NULL,
+  PRIMARY KEY (`OrderID`),
+  KEY `ClientcarID` (`ClientcarID`),
+  KEY `ClientID` (`ClientID`),
+  CONSTRAINT `FK_order_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`),
+  CONSTRAINT `FK_order_clientcar` FOREIGN KEY (`ClientcarID`) REFERENCES `clientcar` (`ClientcarID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -206,8 +192,8 @@ CREATE TABLE IF NOT EXISTS `partcombatiablewithmodel` (
   `ModelID` mediumint(9) NOT NULL,
   KEY `PartID` (`PartID`),
   KEY `ModelID` (`ModelID`),
-  CONSTRAINT `FK_partcombatiablewithmodel_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`),
-  CONSTRAINT `FK_partcombatiablewithmodel_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
+  CONSTRAINT `FK_partcombatiablewithmodel_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
+  CONSTRAINT `FK_partcombatiablewithmodel_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -266,7 +252,6 @@ DROP TABLE IF EXISTS `specificservice`;
 CREATE TABLE IF NOT EXISTS `specificservice` (
   `SpecServiceID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `SpecServiceName` varchar(50) NOT NULL,
-  `SpecServicePrice` int(11) DEFAULT NULL,
   PRIMARY KEY (`SpecServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -280,8 +265,8 @@ CREATE TABLE IF NOT EXISTS `specificservicescanbepreformedonmodel` (
   `ModelID` mediumint(9) NOT NULL,
   KEY `SpecServiceID` (`SpecServiceID`),
   KEY `ModelID` (`ModelID`),
-  CONSTRAINT `FK_specificservicescanbepreformedonmodel_specificservice` FOREIGN KEY (`SpecServiceID`) REFERENCES `specificservice` (`SpecServiceID`),
-  CONSTRAINT `FK_specificservicescanbepreformedonmodel_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
+  CONSTRAINT `FK_specificservicescanbepreformedonmodel_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
+  CONSTRAINT `FK_specificservicescanbepreformedonmodel_specificservice` FOREIGN KEY (`SpecServiceID`) REFERENCES `specificservice` (`SpecServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -294,6 +279,21 @@ CREATE TABLE IF NOT EXISTS `specificservice_amount` (
   `PartName` varchar(50) NOT NULL,
   `SpecService_Amount` int(11) NOT NULL,
   KEY `SpecServiceID` (`SpecServiceID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.specificservice_value
+DROP TABLE IF EXISTS `specificservice_value`;
+CREATE TABLE IF NOT EXISTS `specificservice_value` (
+  `SpecServiceID` mediumint(9) NOT NULL,
+  `ModelID` mediumint(9) NOT NULL,
+  `SpecService_ValuePrice` int(11) DEFAULT NULL,
+  KEY `SpecServiceID` (`SpecServiceID`),
+  KEY `ModelID` (`ModelID`),
+  CONSTRAINT `FK_specificservice_value_specificservice` FOREIGN KEY (`SpecServiceID`) REFERENCES `specificservice` (`SpecServiceID`),
+  CONSTRAINT `FK_specificservice_value_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
