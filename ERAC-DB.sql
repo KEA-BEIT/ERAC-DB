@@ -16,6 +16,18 @@ CREATE DATABASE IF NOT EXISTS `erac-db` /*!40100 DEFAULT CHARACTER SET latin1 */
 USE `erac-db`;
 
 
+-- Dumping structure for procedure erac-db.BudgetGen
+DROP PROCEDURE IF EXISTS `BudgetGen`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `BudgetGen`(IN GetGenServiceID MEDIUMINT)
+BEGIN
+	declare GenPrice INT DEFAULT NULL;
+	SET GenPrice = (SELECT GenServicePrice FROM generelservice WHERE GenServiceID = GetGenServiceID);
+	SELECT 'Service price', GenPrice;
+END//
+DELIMITER ;
+
+
 -- Dumping structure for table erac-db.client
 DROP TABLE IF EXISTS `client`;
 CREATE TABLE IF NOT EXISTS `client` (
@@ -114,9 +126,10 @@ DROP PROCEDURE IF EXISTS `NewOrderGen`;
 DELIMITER //
 CREATE DEFINER=`root`@`localhost` PROCEDURE `NewOrderGen`(IN GetClientID MEDIUMINT, IN GetClientcarID MEDIUMINT, IN GetGenServiceID MEDIUMINT)
 BEGIN
+	declare last_id_in_ordergen INT;
 	INSERT INTO orders (ClientID, ClientcarID) VALUES (GetClientID, GetClientcarID);
-	SET @last_id_in_ordersgen = LAST_INSERT_ID();
-	INSERT INTO orderrequiresgenerelservice (OrderID, GenserviceID) VALUES (@last_id_in_ordergen, GetGenServiceID);
+	SET last_id_in_ordergen = LAST_INSERT_ID();
+	INSERT INTO orderrequiresgenerelservice (OrderID, GenserviceID) VALUES (last_id_in_ordergen, GetGenServiceID);
 END//
 DELIMITER ;
 
@@ -126,9 +139,10 @@ DROP PROCEDURE IF EXISTS `NewOrderSpec`;
 DELIMITER //
 CREATE DEFINER=`root`@`localhost` PROCEDURE `NewOrderSpec`(IN GetClientID MEDIUMINT, IN GetClientcarID MEDIUMINT, IN GetSpecServiceID MEDIUMINT, IN GetOrSSQuantity INT)
 BEGIN
+	declare last_id_in_orderspec INT;
 	INSERT INTO  orders (ClientID, ClientcarID) VALUES (GetClientID, GetClientcarID);
-	SET @last_id_in_orderspec = LAST_INSERT_ID();
-	INSERT INTO orderrequriesspecificservice (OrderID, SpecServiceID, OrSSQuantity) VALUES (@last_id_in_orderspec, GetSpecServiceID, GetOrSSQuantity);
+	SET last_id_in_orderspec = LAST_INSERT_ID();
+	INSERT INTO orderrequriesspecificservice (OrderID, SpecServiceID, OrSSQuantity) VALUES (last_id_in_orderspec, GetSpecServiceID, GetOrSSQuantity);
 END//
 DELIMITER ;
 
@@ -138,13 +152,14 @@ DROP PROCEDURE IF EXISTS `NewPart`;
 DELIMITER //
 CREATE DEFINER=`root`@`localhost` PROCEDURE `NewPart`(IN GetPartName Varchar(50), IN GetPartSN INT, IN GetPart_ConditionID MEDIUMINT, IN GetPart_AmountQuantity INT, IN GetPart_ValuePrice INT)
 BEGIN
+	declare last_id_in_part INT;
 	declare part_id INT DEFAULT NULL;
 	SET part_id = (SELECT PartID FROM part WHERE PartName = GetPartName AND PartSN = GetPartSN);
 	if part_id IS NULL then
 		INSERT INTO part(PartName, PartSN) VALUES (GetPartName, GetPartSN);
-		SET @last_id_in_part = LAST_INSERT_ID();
-		INSERT INTO part_amount(PartID, ConditionID, Part_AmountQuantity) VALUES (@last_id_in_part, GetPart_ConditionID, GetPart_AmountQuantity);
-		INSERT INTO part_value(PartID, ConditionID, Part_ValuePrice) VALUES (@last_id_in_part, GetPart_ConditionID, GetPart_ValuePrice);
+		SET last_id_in_part = LAST_INSERT_ID();
+		INSERT INTO part_amount(PartID, ConditionID, Part_AmountQuantity) VALUES (last_id_in_part, GetPart_ConditionID, GetPart_AmountQuantity);
+		INSERT INTO part_value(PartID, ConditionID, Part_ValuePrice) VALUES (last_id_in_part, GetPart_ConditionID, GetPart_ValuePrice);
 	end if;
 end//
 DELIMITER ;
@@ -343,8 +358,8 @@ CREATE TABLE IF NOT EXISTS `specificservice_value` (
   `SpecService_ValuePrice` int(11) DEFAULT NULL,
   KEY `SpecServiceID` (`SpecServiceID`),
   KEY `ModelID` (`ModelID`),
-  CONSTRAINT `FK_specificservice_value_specificservice` FOREIGN KEY (`SpecServiceID`) REFERENCES `specificservice` (`SpecServiceID`),
-  CONSTRAINT `FK_specificservice_value_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`)
+  CONSTRAINT `FK_specificservice_value_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
+  CONSTRAINT `FK_specificservice_value_specificservice` FOREIGN KEY (`SpecServiceID`) REFERENCES `specificservice` (`SpecServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
