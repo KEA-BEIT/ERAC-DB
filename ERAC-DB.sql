@@ -98,6 +98,58 @@ CREATE TABLE IF NOT EXISTS `model` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for procedure erac-db.NewOldcar
+DROP PROCEDURE IF EXISTS `NewOldcar`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewOldcar`(IN GetOldcarLO_Name Varchar(50), IN GetOldcarLO_Address Varchar(50), IN GetOldcarLO_Phone INT, IN GetOldcarLO_Email Varchar(50))
+BEGIN
+	INSERT INTO oldcar (OldcarLO_Name, OldcarLO_Address, OldcarLO_Phone, OldcarLO_Email)
+	VALUES (GetOldcarLO_Name, GetOldcarLO_Address, GetOldcarLO_Phone, GetOldcarLO_Email);
+END//
+DELIMITER ;
+
+
+-- Dumping structure for procedure erac-db.NewOrderGen
+DROP PROCEDURE IF EXISTS `NewOrderGen`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewOrderGen`(IN GetClientID MEDIUMINT, IN GetClientcarID MEDIUMINT, IN GetGenServiceID MEDIUMINT)
+BEGIN
+	INSERT INTO orders (ClientID, ClientcarID) VALUES (GetClientID, GetClientcarID);
+	SET @last_id_in_ordersgen = LAST_INSERT_ID();
+	INSERT INTO orderrequiresgenerelservice (OrderID, GenserviceID) VALUES (@last_id_in_ordergen, GetGenServiceID);
+END//
+DELIMITER ;
+
+
+-- Dumping structure for procedure erac-db.NewOrderSpec
+DROP PROCEDURE IF EXISTS `NewOrderSpec`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewOrderSpec`(IN GetClientID MEDIUMINT, IN GetClientcarID MEDIUMINT, IN GetSpecServiceID MEDIUMINT, IN GetOrSSQuantity INT)
+BEGIN
+	INSERT INTO  orders (ClientID, ClientcarID) VALUES (GetClientID, GetClientcarID);
+	SET @last_id_in_orderspec = LAST_INSERT_ID();
+	INSERT INTO orderrequriesspecificservice (OrderID, SpecServiceID, OrSSQuantity) VALUES (@last_id_in_orderspec, GetSpecServiceID, GetOrSSQuantity);
+END//
+DELIMITER ;
+
+
+-- Dumping structure for procedure erac-db.NewPart
+DROP PROCEDURE IF EXISTS `NewPart`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewPart`(IN GetPartName Varchar(50), IN GetPartSN INT, IN GetPart_ConditionID MEDIUMINT, IN GetPart_AmountQuantity INT, IN GetPart_ValuePrice INT)
+BEGIN
+	declare part_id INT DEFAULT NULL;
+	SET part_id = (SELECT PartID FROM part WHERE PartName = GetPartName AND PartSN = GetPartSN);
+	if part_id IS NULL then
+		INSERT INTO part(PartName, PartSN) VALUES (GetPartName, GetPartSN);
+		SET @last_id_in_part = LAST_INSERT_ID();
+		INSERT INTO part_amount(PartID, ConditionID, Part_AmountQuantity) VALUES (@last_id_in_part, GetPart_ConditionID, GetPart_AmountQuantity);
+		INSERT INTO part_value(PartID, ConditionID, Part_ValuePrice) VALUES (@last_id_in_part, GetPart_ConditionID, GetPart_ValuePrice);
+	end if;
+end//
+DELIMITER ;
+
+
 -- Dumping structure for table erac-db.oldcar
 DROP TABLE IF EXISTS `oldcar`;
 CREATE TABLE IF NOT EXISTS `oldcar` (
@@ -127,32 +179,15 @@ CREATE TABLE IF NOT EXISTS `oldcargivespart` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table erac-db.order
-DROP TABLE IF EXISTS `order`;
-CREATE TABLE IF NOT EXISTS `order` (
-  `OrderID` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `ClientID` mediumint(9) NOT NULL,
-  `ClientcarID` mediumint(9) NOT NULL,
-  PRIMARY KEY (`OrderID`),
-  KEY `ClientcarID` (`ClientcarID`),
-  KEY `ClientID` (`ClientID`),
-  CONSTRAINT `FK_order_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`),
-  CONSTRAINT `FK_order_clientcar` FOREIGN KEY (`ClientcarID`) REFERENCES `clientcar` (`ClientcarID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- Data exporting was unselected.
-
-
 -- Dumping structure for table erac-db.orderrequiresgenerelservice
 DROP TABLE IF EXISTS `orderrequiresgenerelservice`;
 CREATE TABLE IF NOT EXISTS `orderrequiresgenerelservice` (
   `OrderID` mediumint(9) NOT NULL,
   `GenServiceID` mediumint(9) NOT NULL,
-  `OrGSQuantity` int(11) DEFAULT NULL,
   KEY `OrderID` (`OrderID`),
   KEY `GenServiceID` (`GenServiceID`),
   CONSTRAINT `FK_orderrequiresgenerelservice_generelservice` FOREIGN KEY (`GenServiceID`) REFERENCES `generelservice` (`GenServiceID`),
-  CONSTRAINT `FK_orderrequiresgenerelservice_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`)
+  CONSTRAINT `FK_orderrequiresgenerelservice_order` FOREIGN KEY (`OrderID`) REFERENCES `orders` (`OrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -166,8 +201,24 @@ CREATE TABLE IF NOT EXISTS `orderrequriesspecificservice` (
   `OrSSQuantity` int(11) DEFAULT NULL,
   KEY `SpecServiceID` (`SpecServiceID`),
   KEY `OrderID` (`OrderID`),
-  CONSTRAINT `FK_orderrequriesspecificservice_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`),
+  CONSTRAINT `FK_orderrequriesspecificservice_order` FOREIGN KEY (`OrderID`) REFERENCES `orders` (`OrderID`),
   CONSTRAINT `FK_orderrequriesspecificservice_specificservice` FOREIGN KEY (`SpecServiceID`) REFERENCES `specificservice` (`SpecServiceID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table erac-db.orders
+DROP TABLE IF EXISTS `orders`;
+CREATE TABLE IF NOT EXISTS `orders` (
+  `OrderID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `ClientID` mediumint(9) NOT NULL,
+  `ClientcarID` mediumint(9) NOT NULL,
+  PRIMARY KEY (`OrderID`),
+  KEY `ClientcarID` (`ClientcarID`),
+  KEY `ClientID` (`ClientID`),
+  CONSTRAINT `FK_order_client` FOREIGN KEY (`ClientID`) REFERENCES `client` (`ClientID`),
+  CONSTRAINT `FK_order_clientcar` FOREIGN KEY (`ClientcarID`) REFERENCES `clientcar` (`ClientcarID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -209,7 +260,7 @@ CREATE TABLE IF NOT EXISTS `partusedforspecificserviceinorder` (
   KEY `SpecServiceID` (`SpecServiceID`),
   KEY `OrderID` (`OrderID`),
   KEY `PartID` (`PartID`),
-  CONSTRAINT `FK_partusedformodelinorder_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`),
+  CONSTRAINT `FK_partusedformodelinorder_order` FOREIGN KEY (`OrderID`) REFERENCES `orders` (`OrderID`),
   CONSTRAINT `FK_partusedformodelinorder_part` FOREIGN KEY (`PartID`) REFERENCES `part` (`PartID`),
   CONSTRAINT `FK_partusedformodelinorder_specificservice` FOREIGN KEY (`SpecServiceID`) REFERENCES `specificservice` (`SpecServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
