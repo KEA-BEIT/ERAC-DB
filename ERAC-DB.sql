@@ -28,6 +28,68 @@ END//
 DELIMITER ;
 
 
+-- Dumping structure for procedure erac-db.BudgetSpec
+DROP PROCEDURE IF EXISTS `BudgetSpec`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `BudgetSpec`(IN GetSpecServiceID MEDIUMINT, IN GetModelID MEDIUMINT)
+BEGIN
+	DROP TABLE IF EXISTS partid_tempt;
+	CREATE temporary table partid_tempt (ID MEDIUMINT NOT NULL auto_increment, PartID MEDIUMINT, primary key(id)) engine = innodb;
+	SET @SpecSerCheck = (SELECT SScbpoMID FROM specificservicescanbepreformedonmodel WHERE SpecServiceID = GetSpecServiceID AND ModelID = GetModelID);
+	if @SpecSerCheck IS NOT NULL then
+		SET @Part_name = (SELECT PartName FROM specificservice_amount WHERE SpecServiceID = GetSpecServiceID);
+		INSERT INTO partid_tempt (PartID)
+		SELECT PartID FROM part WHERE PartName = @Part_name;
+		SET @v_counter = 1;
+		SET @v_max = (SELECT COUNT(ID) FROM partid_tempt) + 1;
+		start transaction;
+		while @v_counter < @v_max do
+			SET @PM_ID = (SELECT PcwMID FROM partcombatiablewithmodel WHERE ModelID = GetModelID AND PartID IN (SELECT PartID FROM partid_tempt WHERE ID = @v_counter));
+			if @PM_ID IS NOT NULL then
+				SET @v_counter = @v_max;
+			end if;
+			SET @v_counter = @v_counter + 1;
+		end while;
+		commit;
+		if @PM_ID IS NOT NULL then
+			SET @Part_price_n = (SELECT Part_ValuePrice FROM part_value WHERE PartID = @id AND ConditionID = 1);
+			SET @Part_price_u = (SELECT Part_ValuePrice FROM part_value WHERE PartID = @id AND ConditionID = 2);
+			SET @SS_price = (SELECT SpecService_ValuePrice FROM specificservice_value WHERE SpecServiceID = GetSpecServiceID);
+			SET @SS_amount = (SELECT SpecService_Amount FROM specificservice_amount WHERE SpecServiceID = GetSpecServiceID);
+			SET @S_sum_n = @SS_price + @Part_price_n * @SS_amount;
+			SET @S_sum_u = @SS_price + @Part_price_u * @SS_amount;
+			SELECT 'Service price with new part:', @S_sum_n;
+			SELECT 'Service price with used part:', @S_sum_u;
+		end if;
+	end if;
+END//
+DELIMITER ;
+
+
+-- Dumping structure for procedure erac-db.CarCompatiablePart
+DROP PROCEDURE IF EXISTS `CarCompatiablePart`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CarCompatiablePart`(IN GetClientCarID MEDIUMINT)
+BEGIN
+	DROP TABLE IF EXISTS ccpid_tempt;
+	CREATE temporary table ccpid_tempt (ID MEDIUMINT NOT NULL auto_increment, PartID MEDIUMINT, primary key(id)) engine = innodb;
+	SET @clientcar_model = (SELECT ClientcarModel FROM clientcar WHERE ClientcarID = GetClientCarID);
+	SET @clientcar_make = (SELECT ClientcarMake FROM clientcar WHERE ClientcarID = GetClientCarID);
+	SET @clientcar_fuel = (SELECT ClientcarFuel FROM clientcar WHERE ClientcarID = GetClientCarID);
+
+	SET @model_id = (SELECT ModelID FROM model WHERE ModelName = @clientcar_model AND ModelMake = @clientcar_make AND ModelFuel = @clientcar_fuel);
+
+	INSERT INTO ccpid_tempt (PartID)
+	SELECT PartID FROM partcombatiablewithmodel WHERE ModelID = @model_id;
+
+	SELECT ccpid_tempt.PartID, part_amount.ConditionID, part_amount.Part_AmountQuantity
+	FROM ccpid_tempt
+	INNER JOIN part_amount ON ccpid_tempt.PartID = part_amount.PartID WHERE part_amount.Part_AmountQuantity > 0;
+	
+END//
+DELIMITER ;
+
+
 -- Dumping structure for table erac-db.client
 DROP TABLE IF EXISTS `client`;
 CREATE TABLE IF NOT EXISTS `client` (
@@ -273,7 +335,7 @@ CREATE TABLE IF NOT EXISTS `partusedforspecificserviceinorder` (
   `SpecServiceID` mediumint(9) NOT NULL,
   `OrderID` mediumint(9) NOT NULL,
   `PartID` mediumint(9) NOT NULL,
-  `PufSSiOQuantity` int(11) DEFAULT NULL,
+  `PufSSiOQuantity` int(11) NOT NULL,
   KEY `SpecServiceID` (`SpecServiceID`),
   KEY `OrderID` (`OrderID`),
   KEY `PartID` (`PartID`),
@@ -348,7 +410,8 @@ CREATE TABLE IF NOT EXISTS `specificservice_amount` (
   `SpecServiceID` mediumint(9) NOT NULL,
   `PartName` varchar(50) NOT NULL,
   `SpecService_Amount` int(11) NOT NULL,
-  KEY `SpecServiceID` (`SpecServiceID`)
+  KEY `SpecServiceID` (`SpecServiceID`),
+  CONSTRAINT `FK_specificservice_amount_specificservice` FOREIGN KEY (`SpecServiceID`) REFERENCES `specificservice` (`SpecServiceID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
