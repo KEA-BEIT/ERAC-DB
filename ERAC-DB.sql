@@ -254,8 +254,10 @@ CREATE TABLE IF NOT EXISTS `part` (
 -- Dumping structure for table erac-db.partcombatiablewithmodel
 DROP TABLE IF EXISTS `partcombatiablewithmodel`;
 CREATE TABLE IF NOT EXISTS `partcombatiablewithmodel` (
+  `PcwMID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `PartID` mediumint(9) NOT NULL,
   `ModelID` mediumint(9) NOT NULL,
+  PRIMARY KEY (`PcwMID`),
   KEY `PartID` (`PartID`),
   KEY `ModelID` (`ModelID`),
   CONSTRAINT `FK_partcombatiablewithmodel_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
@@ -327,8 +329,10 @@ CREATE TABLE IF NOT EXISTS `specificservice` (
 -- Dumping structure for table erac-db.specificservicescanbepreformedonmodel
 DROP TABLE IF EXISTS `specificservicescanbepreformedonmodel`;
 CREATE TABLE IF NOT EXISTS `specificservicescanbepreformedonmodel` (
+  `SScbpoMID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `SpecServiceID` mediumint(9) NOT NULL,
   `ModelID` mediumint(9) NOT NULL,
+  PRIMARY KEY (`SScbpoMID`),
   KEY `SpecServiceID` (`SpecServiceID`),
   KEY `ModelID` (`ModelID`),
   CONSTRAINT `FK_specificservicescanbepreformedonmodel_model` FOREIGN KEY (`ModelID`) REFERENCES `model` (`ModelID`),
