@@ -31,7 +31,7 @@ DELIMITER ;
 -- Dumping structure for procedure erac-db.BudgetSpec
 DROP PROCEDURE IF EXISTS `BudgetSpec`;
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `BudgetSpec`(IN GetSpecServiceID MEDIUMINT, IN GetModelID MEDIUMINT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `budgetspec`(IN `GetSpecServiceID` MEDIUMINT, IN `GetModelID` MEDIUMINT)
 BEGIN
 	DROP TABLE IF EXISTS partid_tempt;
 	CREATE temporary table partid_tempt (ID MEDIUMINT NOT NULL auto_increment, PartID MEDIUMINT, primary key(id)) engine = innodb;
@@ -52,10 +52,14 @@ BEGIN
 		end while;
 		commit;
 		if @PM_ID IS NOT NULL then
-			SET @Part_price_n = (SELECT Part_ValuePrice FROM part_value WHERE PartID = @id AND ConditionID = 1);
-			SET @Part_price_u = (SELECT Part_ValuePrice FROM part_value WHERE PartID = @id AND ConditionID = 2);
-			SET @SS_price = (SELECT SpecService_ValuePrice FROM specificservice_value WHERE SpecServiceID = GetSpecServiceID);
+			SET @Part_price_n = (SELECT Part_ValuePrice FROM part_value WHERE PartID = @PM_ID AND ConditionID = 1);
+			SET @Part_price_u = (SELECT Part_ValuePrice FROM part_value WHERE PartID = @PM_ID AND ConditionID = 2);
+			SET @SS_price = (SELECT SpecService_ValuePrice FROM specificservice_value WHERE SpecServiceID = GetSpecServiceID limit 0,1);
 			SET @SS_amount = (SELECT SpecService_Amount FROM specificservice_amount WHERE SpecServiceID = GetSpecServiceID);
+			SELECT @Part_price_n;
+			SELECT @Part_price_u;
+			SELECT @SS_price;
+			SELECT @SS_amount;
 			SET @S_sum_n = @SS_price + @Part_price_n * @SS_amount;
 			SET @S_sum_u = @SS_price + @Part_price_u * @SS_amount;
 			SELECT 'Service price with new part:', @S_sum_n;
